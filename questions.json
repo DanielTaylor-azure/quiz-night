@@ -1,17 +1,52 @@
 {
-  "title": "Dan's Beat the Clock – sample questions",
   "questions": [
-    { "category": "Geography", "question": "What is the capital city of Australia?", "answer": "Canberra" },
-    { "category": "Maths", "question": "How many sides does a hexagon have?", "answer": "Six" },
-    { "category": "Science", "question": "What is the chemical symbol for gold?", "answer": "Au" },
-    { "category": "Space", "question": "Which planet is known as the Red Planet?", "answer": "Mars" },
-    { "category": "Art", "question": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci" },
-    { "category": "Geography", "question": "What is the largest ocean on Earth?", "answer": "The Pacific Ocean" },
-    { "category": "History", "question": "In which year did the Titanic sink?", "answer": "1912" },
-    { "category": "Sport", "question": "How many players from one team are on the field at a time in a soccer match?", "answer": "Eleven" },
-    { "category": "Science", "question": "What is the hardest natural substance on Earth?", "answer": "Diamond" },
-    { "category": "History", "question": "Which country gave the Statue of Liberty to the United States?", "answer": "France" },
-    { "category": "Science", "question": "Which gas do plants take in from the air for photosynthesis?", "answer": ["Carbon dioxide", "CO2"] },
-    { "category": "Maths", "question": "What is the smallest prime number?", "answer": "Two" }
+    {
+      "question": "What is the capital city of Australia?",
+      "answer": "Canberra"
+    },
+    {
+      "question": "How many sides does a hexagon have?",
+      "answer": "Six"
+    },
+    {
+      "question": "What is the chemical symbol for gold?",
+      "answer": "Au"
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "answer": "Mars"
+    },
+    {
+      "question": "Who painted the Mona Lisa?",
+      "answer": "Leonardo da Vinci"
+    },
+    {
+      "question": "What is the largest ocean on Earth?",
+      "answer": "The Pacific Ocean"
+    },
+    {
+      "question": "In which year did the Titanic sink?",
+      "answer": "1912"
+    },
+    {
+      "question": "How many players from one team are on the field at a time in a soccer match?",
+      "answer": "Eleven"
+    },
+    {
+      "question": "What is the hardest natural substance on Earth?",
+      "answer": "Diamond"
+    },
+    {
+      "question": "Which country gave the Statue of Liberty to the United States?",
+      "answer": "France"
+    },
+    {
+      "question": "Which gas do plants take in from the air for photosynthesis?",
+      "answer": "Carbon dioxide"
+    },
+    {
+      "question": "What is the smallest prime number?",
+      "answer": "Two"
+    }
   ]
 }

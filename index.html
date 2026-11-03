@@ -541,16 +541,6 @@
   .rc-dot.warn, .rm-status.warn .rm-dot{ background:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
   .rc-dot.bad, .rm-status.bad .rm-dot{ background:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
 
-  .rc-toast{
-    position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top, 0px));
-    transform:translate(-50%,-14px); opacity:0; pointer-events:none; z-index:10002;
-    background:var(--panel-2); border:1px solid var(--teal); color:var(--paper);
-    padding:10px 18px; border-radius:999px; font-weight:700; font-size:0.9rem;
-    box-shadow:var(--shadow); white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis;
-    transition:opacity .18s ease, transform .18s ease;
-  }
-  .rc-toast.show{ opacity:1; transform:translate(-50%,0); }
-  .rc-toast.dim{ border-color:var(--line); color:var(--muted); }
 
   .remote-box{ max-width:400px; }
   .rc-qr{
@@ -650,7 +640,6 @@
   .rm-foot .rc-linkbtn{ margin-top:0; }
   @media (prefers-reduced-motion: reduce){
     .rm-btn.sent{ animation:none; }
-    .rc-toast{ transition:none; }
   }
 
   /* ================= FIT-TO-SCREEN LAYOUT (no scrollbars) =================
@@ -787,12 +776,6 @@
   }
   .rm-rhead{ flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:20px; }
   .rm-rcount{ font-family:var(--font-mono); font-size:0.76rem; font-weight:700; letter-spacing:0.06em; color:var(--muted); }
-  .rm-rcat{
-    font-size:0.66rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold);
-    background:var(--gold-soft); border-radius:999px; padding:3px 10px; max-width:58%;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .rm-rcat:empty{ display:none; }
   .rm-rbody{
     flex:1 1 0; min-height:0; overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column;
     --qfs:24px; -webkit-overflow-scrolling:touch;
@@ -840,6 +823,74 @@
   /* header never changes height (a wrapping status pill used to nudge everything below it) */
   .rm-status{ min-width:0; white-space:nowrap; overflow:hidden; }
   .rm-status #rmStatusText{ overflow:hidden; text-overflow:ellipsis; }
+
+  /* ================= NOTHING MOVES =================
+     Elements that come and go keep their space reserved (they are hidden, not removed), and the
+     controls that swap places share one fixed-size zone, so no event or panel shifts the graphics. */
+  .keep.hidden{ display:var(--keep-display, block) !important; visibility:hidden !important; }
+  .answer-row.keep, .adjust-panel.keep, .footer-actions.keep{ --keep-display:flex; }
+  .ctrl-zone{ display:grid; }
+  .zone-run, .zone-over{ grid-area:1 / 1; min-width:0; pointer-events:none; }
+  .zone-run > *, .zone-over > *{ pointer-events:auto; }
+  .ctrl-row{ display:grid; justify-content:center; justify-items:center; margin-top:10px; }
+  .ctrl-row > .btn{ grid-area:1 / 1; }
+
+  /* ================= SCREEN EDGES =================
+     Keep clear of the borders, which some phones fade out or curve away. */
+  :root{
+    --edge-t:calc(env(safe-area-inset-top, 0px) + 20px);
+    --edge-r:calc(env(safe-area-inset-right, 0px) + 20px);
+    --edge-b:calc(env(safe-area-inset-bottom, 0px) + 22px);
+    --edge-l:calc(env(safe-area-inset-left, 0px) + 20px);
+  }
+  #remoteApp{ padding:var(--edge-t) var(--edge-r) var(--edge-b) var(--edge-l); }
+  .rm-sheet{ padding:var(--edge-t) var(--edge-r) var(--edge-b) var(--edge-l); }
+  .rm-sheet-inner{ border-radius:20px; }
+  .rm-sheet.full .rm-sheet-inner{ height:100%; }
+  .modal-overlay{ padding:var(--edge-t) var(--edge-r) var(--edge-b) var(--edge-l); }
+  .rm-sort{ height:40px; font-size:0.88rem; flex:0 0 auto; }
+
+  /* the web address under the QR code is always a single line (JS shrinks it to fit) */
+  .rc-link{ white-space:nowrap; word-break:normal; overflow:hidden; text-align:center; }
+
+  /* final results: WINNER / OUT OF TIME line up in their own column */
+  .rank-row{
+    display:grid; grid-template-columns:auto minmax(0, 1fr) 6.9rem auto 5.6rem; align-items:center; column-gap:12px;
+  }
+  .rank-left, .rank-right{ display:contents; }
+  .rank-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank-tag{ margin-left:0; text-align:left; white-space:nowrap; }
+  .rank-right > :last-child{ text-align:right; white-space:nowrap; }
+  .stats-grid{ grid-template-columns:repeat(2, 1fr); }
+
+  .timeup-banner{ display:flex; align-items:center; justify-content:center; min-height:6rem; }
+  .timeup-banner.keep{ --keep-display:flex; }
+
+  /* short (landscape) phone screens: keep the players editor usable */
+  @media (max-height:480px){
+    .rm-pmsg{ display:none; }
+    .rm-sheet.full .rm-sheet-inner{ gap:6px; padding-top:10px; padding-bottom:10px; }
+    .rm-sheet.full .rm-sheet-inner > .rm-btn{ height:34px; font-size:0.85rem; }
+    .rm-phead .rm-x{ height:34px; }
+  }
+  @media (max-height:480px){
+    .rm-sheet:not(.full) .rm-sheet-inner{ gap:6px; padding-top:8px; padding-bottom:8px; }
+    .rm-sheet:not(.full) .rm-sheet-inner > .rm-btn{ height:34px; font-size:0.85rem; }
+    .rm-host-row .field-label{ margin-bottom:4px; }
+  }
+
+  /* the player the host is asking right now (reported by the main screen) */
+  .rm-rhead{ min-height:26px; }
+  .rm-rplayer{
+    display:inline-flex; align-items:center; gap:7px; min-width:0; max-width:66%;
+    padding:3px 12px 3px 10px; border-radius:999px; line-height:1.2;
+    background:var(--gold-soft); border:1px solid rgba(231,183,64,0.45); color:var(--gold);
+    font-size:0.82rem; font-weight:800;
+  }
+  .rm-rplayer.invisible{ visibility:hidden; }
+  .rm-rplayer[data-ph="run"]{ background:var(--teal-soft); border-color:rgba(62,198,224,0.55); color:var(--teal); }
+  .rm-rdot{ width:8px; height:8px; border-radius:50%; background:currentColor; flex:0 0 auto; }
+  #rmQPlayerName{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -848,7 +899,7 @@
 <div class="countdown-overlay hidden" id="countdownOverlay">
   <div class="countdown-num" id="countdownNum">3</div>
 </div>
-<div class="rc-toast" id="rcToast" role="status" aria-live="polite"></div>
+<div id="insetProbe" aria-hidden="true" style="position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);"></div>
 <div id="app">
 <div id="fit" class="fit land">
 
@@ -913,23 +964,26 @@
     </div>
 
 
+    <div class="ctrl-zone">
+    <div class="zone-run">
     <div class="ctrl-row">
-      <button class="btn btn-gold btn-lg" id="startBtn">Start Clock</button>
-      <button class="btn hidden" id="pauseBtn">Pause Game</button>
+      <button class="btn btn-gold btn-lg keep" id="startBtn">Start Clock</button>
+      <button class="btn keep hidden" id="pauseBtn">Pause Game</button>
     </div>
 
-    <div class="answer-row hidden" id="answerRow">
+    <div class="answer-row keep hidden" id="answerRow">
       <button class="btn btn-teal btn-block" id="correctBtn">Correct</button>
     </div>
-    <p class="game-hint" id="gameHint">Getting an answer correct stops your clock and passes play to the next player!</p>
-
-    <div class="timeup-banner hidden" id="timeUpBanner"></div>
-    <div class="admin-wrap hidden" id="adminWrap">
+    <p class="game-hint keep" id="gameHint">Getting an answer correct stops your clock and passes play to the next player!</p>
+    </div>
+    <div class="zone-over">
+    <div class="timeup-banner keep hidden" id="timeUpBanner"></div>
+    <div class="admin-wrap keep hidden" id="adminWrap">
       <button class="admin-toggle" id="adminToggle" aria-expanded="false" aria-controls="bonusTimeRow" title="Show host controls">
         <span class="admin-toggle-icon" id="adminToggleIcon">⚙</span>
         <span id="adminToggleLabel">Host controls</span>
       </button>
-      <div class="adjust-panel hidden" id="bonusTimeRow">
+      <div class="adjust-panel keep hidden" id="bonusTimeRow">
         <div class="adjust-half">
           <label class="field-label" for="bonusTimeInput">Add time to remaining players</label>
           <div class="row">
@@ -949,8 +1003,10 @@
         </div>
       </div>
     </div>
-    <div class="footer-actions hidden" id="continueRow">
+    <div class="footer-actions keep hidden" id="continueRow">
       <button class="btn btn-lg" id="continueBtn">Continue →</button>
+    </div>
+    </div>
     </div>
     </div>
     <div class="game-right">
@@ -1004,13 +1060,13 @@
       <section class="rm-reader" aria-label="Question reader">
         <div class="rm-rhead">
           <span class="rm-rcount" id="rmQCount">Questions</span>
-          <span class="rm-rcat" id="rmQCat"></span>
+          <span class="rm-rplayer invisible" id="rmQPlayer" aria-label="Current player"><span class="rm-rdot"></span><span id="rmQPlayerName"></span></span>
         </div>
         <div class="rm-rbody" id="rmQBody">
           <div class="rm-qwrap">
             <div class="rm-qtext dim" id="rmQText">Loading questions…</div>
             <div class="rm-qans hidden" id="rmQAns"><span class="rm-qlabel">Answer</span><span id="rmQAnsText"></span></div>
-            <button type="button" class="rm-qbtn action hidden" id="rmQAction">Try again</button>
+            <button type="button" class="rm-qbtn action hidden" id="rmQAction">Start over</button>
           </div>
         </div>
         <div class="rm-rnav">
@@ -1052,7 +1108,6 @@
       </div>
       <div class="rm-qset">
         <label class="rm-toggle"><input type="checkbox" id="rmQAdv" checked> Next question after Correct</label>
-        <button type="button" class="rc-linkbtn" id="rmQReload">Reload questions</button>
       </div>
       <div class="rm-last" id="rmSheetLast" aria-live="polite"></div>
       <button type="button" class="rm-btn" id="rmNewGame">New game</button>
@@ -1068,10 +1123,10 @@
     <div class="rm-sheet-inner">
       <div class="rm-phead">
         <div class="rm-sheet-title">Players</div>
-        <button type="button" class="rc-linkbtn" id="rmSortBtn">Sort by time</button>
         <button type="button" class="rm-x" id="rmPlayersClose" aria-label="Close players">✕</button>
       </div>
       <div class="rm-plist" id="rmPlist"></div>
+      <button type="button" class="rm-btn rm-sort" id="rmSortBtn">↕ Sort by time (most first)</button>
       <div class="rm-padd">
         <input type="text" class="rm-pname" id="rmAddName" maxlength="20" placeholder="New player" autocomplete="off" autocorrect="off" enterkeyhint="done" aria-label="New player name">
         <input type="number" class="rm-ptime" id="rmAddTime" value="60" min="1" max="1800" step="1" inputmode="numeric" aria-label="Time in seconds">
@@ -1458,7 +1513,8 @@
         timeGranted: p.time*1000, // total time made available (start + net adjustments), for time-expended stat
         startRank: idx, // starting standing (0 = top), for positions-gained stat
         lastSecond:null, correctCount:0,
-        fastestAnswerMs: null
+        fastestAnswerMs: null,
+        closestShaveMs: null
       };
     });
     state.activeIndex = 0;
@@ -1693,6 +1749,8 @@
     if(!gameEligible()) return;
     var p = activePlayer();
     p.correctCount += 1;
+    // closest shave: how little time was left on their clock when they got it right
+    if(p.closestShaveMs == null || p.timeLeft < p.closestShaveMs) p.closestShaveMs = p.timeLeft;
 
     // Record the fastest single turn (from when this player's turn began to now).
     var nowMs = (window.performance && performance.now) ? performance.now() : Date.now();
@@ -1966,6 +2024,17 @@
     } else {
       grid.appendChild(statCard('🎯', 'Fastest Average', '—', 'no answers'));
     }
+
+    var shave = null;
+    state.players.forEach(function(p){
+      if(p.closestShaveMs == null) return;
+      if(shave == null || p.closestShaveMs < shave.ms){ shave = { p:p, ms:p.closestShaveMs }; }
+    });
+    if(shave){
+      grid.appendChild(statCard('😅', 'Closest Shave', shave.p.name, (shave.ms/1000).toFixed(1) + 's left'));
+    } else {
+      grid.appendChild(statCard('😅', 'Closest Shave', '—', 'no answers'));
+    }
   }
 
   function renderResult(){
@@ -2011,6 +2080,10 @@
         tag.className = 'rank-tag';
         tag.textContent = 'OUT OF TIME';
         left.appendChild(tag);
+      } else {
+        var none = document.createElement('span');
+        none.className = 'rank-tag';
+        left.appendChild(none);
       }
       var right = document.createElement('div');
       right.className = 'rank-right';
@@ -2082,6 +2155,12 @@
      560px portrait) and then scaled up or down so it always fits the window exactly.
      That is why there are never any scrollbars. */
   var fitScale = 1;
+  function readInsets(){
+    var p = $('#insetProbe');
+    if(!p) return { t:0, r:0, b:0, l:0 };
+    var cs = window.getComputedStyle(p);
+    return { t:parseFloat(cs.paddingTop) || 0, r:parseFloat(cs.paddingRight) || 0, b:parseFloat(cs.paddingBottom) || 0, l:parseFloat(cs.paddingLeft) || 0 };
+  }
   function fitApp(){
     var fit = $('#fit');
     if(!fit || document.body.classList.contains('is-remote')) return;
@@ -2095,11 +2174,20 @@
     }
     var w = fit.offsetWidth, h = fit.offsetHeight;
     if(!w || !h) return;
-    var s = Math.min((vw - 12) / w, (vh - 12) / h);
-    s = Math.max(0.15, Math.min(s, 2.6));
-    if(Math.abs(s - fitScale) > 0.002 || !fit._placed){
-      fitScale = s;
+    // keep everything clear of the screen edges: some phones fade or curve their borders
+    var ins = readInsets();
+    var m = Math.max(28, Math.round(Math.min(vw, vh) * 0.045));
+    var aL = ins.l + m, aR = ins.r + m, aT = ins.t + m, aB = ins.b + m;
+    var aw = vw - aL - aR, ah = vh - aT - aB;
+    var s = Math.max(0.15, Math.min(aw / w, ah / h, 2.6));
+    var cx = aL + aw / 2, cy = aT + ah / 2;
+    var key = s.toFixed(3) + '|' + cx.toFixed(1) + '|' + cy.toFixed(1);
+    if(fit._key !== key){
+      fit._key = key;
       fit._placed = true;
+      fitScale = s;
+      fit.style.left = cx + 'px';
+      fit.style.top = cy + 'px';
       fit.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
     }
   }
@@ -2152,6 +2240,7 @@
   function remoteUrl(code){
     var u = new URL(window.location.href);
     u.search = ''; u.hash = '';
+    u.pathname = u.pathname.replace(/index\.html$/i, ''); // /repo/index.html and /repo/ are the same page
     u.searchParams.set('remote', code);
     return u.toString();
   }
@@ -2168,6 +2257,24 @@
     var heartbeat = null;
 
     function changed(){ if(cb.onStatus) cb.onStatus({}); }
+    var OFF = '{"on":0}';
+    // what the display tells the phone: it is here, and whose turn it is (if a game is running)
+    function presencePayload(){
+      var o = { on:1, t:Date.now() };
+      var turn = cb.getTurn ? cb.getTurn() : null;
+      if(turn){ o.p = turn.p; o.ph = turn.ph; }
+      return JSON.stringify(o);
+    }
+    function parsePresence(text){
+      if(text === 'online') return { on:true, p:'', ph:'', t:0 };
+      try{
+        var o = JSON.parse(text);
+        if(o && typeof o === 'object'){
+          return { on:!!o.on, p:(typeof o.p === 'string' ? o.p.slice(0, 40) : ''), ph:(typeof o.ph === 'string' ? o.ph.slice(0, 8) : ''), t:(typeof o.t === 'number' ? o.t : 0) };
+        }
+      }catch(e){}
+      return { on:false, p:'', ph:'', t:0 };
+    }
 
     function start(){
       stop(false);
@@ -2176,13 +2283,13 @@
         return;
       }
       BROKERS.forEach(function(url){
-        var e = { url:url, ok:false, presence:null, dead:false, client:null };
+        var e = { url:url, ok:false, presence:null, state:null, dead:false, client:null };
         entries.push(e);
         var opts = {
           clientId:'btc' + role.charAt(0) + randomString(9, 'abcdefghijklmnopqrstuvwxyz0123456789'),
           clean:true, keepalive:15, reconnectPeriod:2500, connectTimeout:8000, protocolVersion:4
         };
-        if(role === 'display'){ opts.will = { topic:tPres, payload:'offline', qos:1, retain:true }; }
+        if(role === 'display'){ opts.will = { topic:tPres, payload:OFF, qos:1, retain:true }; }
         var c;
         try{ c = mqtt.connect(url, opts); }catch(err){ return; }
         e.client = c;
@@ -2191,13 +2298,13 @@
           e.ok = true;
           if(role === 'display'){
             c.subscribe(tCmd, { qos:0 });
-            c.publish(tPres, 'online', { qos:1, retain:true });
+            c.publish(tPres, presencePayload(), { qos:1, retain:true });
           } else {
             c.subscribe(tPres, { qos:1 });
           }
           changed();
         });
-        function lost(){ if(e.dead) return; e.ok = false; if(role === 'remote') e.presence = null; changed(); }
+        function lost(){ if(e.dead) return; e.ok = false; if(role === 'remote'){ e.presence = null; e.state = null; } changed(); }
         c.on('close', lost);
         c.on('offline', lost);
         c.on('error', function(){ /* the client retries on its own */ });
@@ -2205,7 +2312,7 @@
           if(e.dead) return;
           var text = decodePayload(payload);
           if(role === 'display' && topic === tCmd){ if(cb.onCommand) cb.onCommand(text); }
-          else if(role === 'remote' && topic === tPres){ e.presence = (text === 'online'); changed(); }
+          else if(role === 'remote' && topic === tPres){ var st = parsePresence(text); e.presence = st.on; e.state = st.on ? st : null; changed(); }
         });
       });
       if(role === 'display'){
@@ -2213,7 +2320,7 @@
         heartbeat = setInterval(function(){
           entries.forEach(function(e){
             if(e.ok && e.client && e.client.connected){
-              try{ e.client.publish(tPres, 'online', { qos:0, retain:true }); }catch(err){}
+              try{ e.client.publish(tPres, presencePayload(), { qos:0, retain:true }); }catch(err){}
             }
           });
         }, 8000);
@@ -2230,7 +2337,7 @@
         var c = e.client;
         if(!c) return;
         try{
-          if(graceful && role === 'display' && e.ok){ c.publish(tPres, 'offline', { qos:1, retain:true }); }
+          if(graceful && role === 'display' && e.ok){ c.publish(tPres, OFF, { qos:1, retain:true }); }
           setTimeout(function(){ try{ c.end(true); }catch(err){} }, graceful ? 350 : 0);
         }catch(err){}
       });
@@ -2248,6 +2355,23 @@
           }
         });
         return n;
+      },
+      // display: send the phone the latest status right now (used when the current player changes)
+      refresh:function(){
+        var text = presencePayload();
+        entries.forEach(function(e){
+          if(e.ok && e.client && e.client.connected){
+            try{ e.client.publish(tPres, text, { qos:0, retain:true }); }catch(err){}
+          }
+        });
+      },
+      // phone: whose turn the display last reported (the newest report from any relay wins)
+      displayTurn:function(){
+        var best = null;
+        entries.forEach(function(e){
+          if(e.ok && e.presence === true && e.state && (!best || e.state.t >= best.t)) best = e.state;
+        });
+        return best && best.p ? { p:best.p, ph:best.ph } : null;
       },
       connectedCount:function(){ var n = 0; entries.forEach(function(e){ if(e.ok) n++; }); return n; },
       displayOnline:function(){ return entries.some(function(e){ return e.ok && e.presence === true; }); }
@@ -2300,16 +2424,6 @@
       if(!ctx._rcWatched){ ctx._rcWatched = true; ctx.onstatechange = updateRcUi; }
     }
     updateRcUi();
-  }
-
-  var toastTimer = null;
-  function showToast(text, dim){
-    var t = $('#rcToast');
-    t.textContent = text;
-    t.classList.toggle('dim', !!dim);
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1500);
   }
 
   var CMD_LABEL = {
@@ -2383,7 +2497,6 @@
         if((onGame || state.screen === 'result') && !state.countdownActive){ $('#confirmYesBtn').click(); done = true; }
         break;
     }
-    showToast('📱 ' + label + (done ? '' : ' — not available right now'), !done);
   }
 
   function handleIncoming(text){
@@ -2398,12 +2511,27 @@
     runRemoteCommand(m.cmd, m.arg);
   }
 
+  // The player the host is asking right now: the one on the clock, or - while the "clock depleted"
+  // message is showing - the player who will be up next. Nobody on the setup and results screens.
+  function turnInfo(){
+    if(state.screen !== 'game' || !state.game || state.game.over) return null;
+    var bannerUp = !$('#timeUpBanner').classList.contains('hidden');
+    var idx = state.activeIndex, ph;
+    if(bannerUp && state.pendingNextIndex !== null && state.pendingNextIndex >= 0){ idx = state.pendingNextIndex; ph = 'next'; }
+    else if(!state.game.started) ph = 'ready';
+    else if(state.game.paused || state.countdownActive) ph = 'paused';
+    else ph = 'run';
+    var p = state.players[idx];
+    return p ? { p:String(p.name).slice(0, 40), ph:ph } : null;
+  }
+
   function startDisplayLink(){
     if(dispLink) dispLink.stop(false);
     rcLinkError = false;
     dispLink = createLink('display', rcCode, {
       onStatus:function(info){ if(info && info.error === 'lib') rcLinkError = true; updateRcUi(); },
-      onCommand:handleIncoming
+      onCommand:handleIncoming,
+      getTurn:turnInfo
     });
     dispLink.start();
     requestWake();
@@ -2420,15 +2548,15 @@
     $('#rcChipText').textContent = rcCode + (locked ? ' 🔇' : '');
     $('#rcCode').textContent = rcCode;
     var st = $('#rcStatus');
-    if(rcLinkError){ st.textContent = 'The relay library could not load. Check your internet connection and reload.'; st.className = 'rc-status bad'; }
-    else if(n > 0){ st.textContent = 'Ready · connected to ' + n + ' of ' + BROKERS.length + ' relays'; st.className = 'rc-status ok'; }
-    else { st.textContent = 'Connecting to relays…'; st.className = 'rc-status'; }
+    if(rcLinkError){ st.textContent = 'Could not load the connection library. Check your internet connection and reload.'; st.className = 'rc-status bad'; }
+    else if(n > 0){ st.textContent = 'Ready'; st.className = 'rc-status ok'; }
+    else { st.textContent = 'Connecting…'; st.className = 'rc-status'; }
     $('#rcAudioNote').classList.toggle('hidden', !locked);
   }
 
   function openRemoteModal(){
     var url = remoteUrl(rcCode);
-    $('#rcLink').textContent = url;
+    $('#rcLink').setAttribute('data-full', url.replace(/^https?:\/\//, ''));
     var box = $('#rcQr');
     box.innerHTML = '';
     box.classList.add('hidden');
@@ -2448,16 +2576,40 @@
     }
     updateRcUi();
     $('#remoteModal').classList.remove('hidden');
+    fitRcLink();
     fitRemoteModal();
+  }
+  // the web address under the QR code must always sit on a single line: shrink it a little, and if it is
+  // still too long shorten the middle (the start and the room code at the end stay visible)
+  function fitRcLink(){
+    var el = $('#rcLink');
+    if(!el || $('#remoteModal').classList.contains('hidden')) return;
+    var full = el.getAttribute('data-full') || el.textContent;
+    el.textContent = full;
+    el.style.fontSize = '';
+    var fs = parseFloat(window.getComputedStyle(el).fontSize) || 11;
+    function over(){ return el.scrollWidth > el.clientWidth + 0.5; }
+    while(fs > 8.5 && over()){ fs -= 0.5; el.style.fontSize = fs + 'px'; }
+    if(over()){
+      var tail = full.slice(-Math.min(24, full.length));
+      var lo = 0, hi = Math.max(0, full.length - tail.length);
+      while(lo < hi){
+        var mid = Math.ceil((lo + hi) / 2);
+        el.textContent = full.slice(0, mid) + '…' + tail;
+        if(over()) hi = mid - 1; else lo = mid;
+      }
+      el.textContent = full.slice(0, lo) + '…' + tail;
+    }
   }
   function fitRemoteModal(){
     var box = document.querySelector('#remoteModal .modal-box');
     if(!box || $('#remoteModal').classList.contains('hidden')) return;
     box.style.transform = '';
-    var h = box.offsetHeight, avail = window.innerHeight - 24;
+    var ov = $('#remoteModal'), cs = window.getComputedStyle(ov);
+    var h = box.offsetHeight, avail = ov.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
     if(h > avail && avail > 100) box.style.transform = 'scale(' + (avail / h) + ')';
   }
-  window.addEventListener('resize', fitRemoteModal);
+  window.addEventListener('resize', function(){ fitRcLink(); fitRemoteModal(); });
   function closeRemoteModal(){ $('#remoteModal').classList.add('hidden'); }
 
   function enableRemote(){
@@ -2511,6 +2663,12 @@
 
     if(store.get('btc_remote_on') === '1') enableRemote();
     setInterval(updateRcUi, 1500);
+    var lastTurn = '';
+    setInterval(function(){          // tell the phone as soon as the current player changes
+      if(!dispLink) return;
+      var now = JSON.stringify(turnInfo());
+      if(now !== lastTurn){ lastTurn = now; dispLink.refresh(); }
+    }, 300);
   }
 
   /* ================= REMOTE: PHONE SIDE ================= */
@@ -2532,6 +2690,19 @@
     else { cls = 'warn'; text = 'Waiting for the display…'; }
     box.className = 'rm-status ' + cls;
     txt.textContent = text;
+    updateTurnPill();
+  }
+  function updateTurnPill(){
+    var pill = $('#rmQPlayer'), name = $('#rmQPlayerName');
+    var turn = rmLink ? rmLink.displayTurn() : null;
+    if(!turn){
+      pill.classList.add('invisible'); pill.removeAttribute('data-ph'); name.textContent = '';
+      return;
+    }
+    name.textContent = turn.p;
+    pill.setAttribute('data-ph', turn.ph);
+    pill.setAttribute('title', turn.ph === 'run' ? 'On the clock' : (turn.ph === 'next' ? 'Up next' : 'Current player'));
+    pill.classList.remove('invisible');
   }
 
   function showPair(prefill){
@@ -2703,16 +2874,15 @@
   }
 
   /* ---- question reader (phone): reads questions.json from the same folder as this page ----
-     Accepted shapes:  [ {question, answer, category}, ... ]   or   { "questions": [ ... ] }
-     Also accepted: plain strings, and the short keys q / a. "answer" may be a list. */
+     Format:  { "questions": [ { "question": "...", "answer": "..." }, ... ] }
+     (a plain list of those objects also works). One answer per question; no categories. */
   var QFILE = 'questions.json';
-  var rmQs = [], rmQIdx = 0, rmQState = 'loading', rmQMsg = '';
+  var rmQs = [], rmQIdx = 0, rmQState = 'loading', rmQMsg = '', rmQTries = 0, rmQTimer = null;
   var rmQAdvance = store.get('btc_q_adv') !== '0';
 
   function qStr(v){
-    if(Array.isArray(v)) v = v.filter(function(x){ return x !== null && x !== undefined && typeof x !== 'object'; }).join(' / ');
-    if(v === null || v === undefined || typeof v === 'object') return '';
-    return String(v).replace(/\s+/g, ' ').trim();
+    if(typeof v === 'string' || typeof v === 'number') return String(v).replace(/\s+/g, ' ').trim();
+    return ''; // lists and objects are not accepted
   }
   function qPick(o, keys){
     for(var i = 0; i < keys.length; i++){
@@ -2726,24 +2896,23 @@
     if(!arr) return null;
     var out = [];
     for(var i = 0; i < arr.length && out.length < 2000; i++){
-      var it = arr[i], q = '', a = '', c = '';
+      var it = arr[i], q = '', a = '';
       if(typeof it === 'string' || typeof it === 'number'){ q = qStr(it); }
       else if(it && typeof it === 'object' && !Array.isArray(it)){
         q = qStr(qPick(it, ['question', 'q', 'text', 'prompt', 'clue']));
-        a = qStr(qPick(it, ['answer', 'a', 'answers', 'solution']));
-        c = qStr(qPick(it, ['category', 'cat', 'round', 'topic', 'type']));
+        a = qStr(qPick(it, ['answer', 'a', 'solution'])); // a single answer; a list is ignored
       }
       if(!q) continue;
-      out.push({ q:q.slice(0, 800), a:a.slice(0, 400), c:c.slice(0, 40) });
+      out.push({ q:q.slice(0, 800), a:a.slice(0, 400) });
     }
     return out;
   }
   function qSig(){ return rmQs.length ? (rmQs.length + ':' + rmQs[0].q.slice(0, 40)) : ''; }
   function qSave(){ store.set('btc_q_idx', String(rmQIdx)); }
 
-  function loadQuestions(){
-    rmQState = 'loading';
-    renderQuestion();
+  function loadQuestions(quiet){
+    clearTimeout(rmQTimer);
+    if(!quiet){ rmQState = 'loading'; renderQuestion(); }
     var url = QFILE;
     try{ url = new URL(QFILE, window.location.href).toString(); }catch(e){}
     var req;
@@ -2758,6 +2927,7 @@
       var list = parseQuestions(data);
       if(!list){ var er2 = new Error('shape'); er2.kind = 'shape'; throw er2; }
       rmQs = list;
+      rmQTries = 0;
       var sig = qSig();
       var saved = parseInt(store.get('btc_q_idx'), 10);
       // keep your place across reloads, but start again if the file was changed
@@ -2774,15 +2944,19 @@
       else if(err && err.kind === 'shape') rmQMsg = 'questions.json should be a list of questions, or an object with a "questions" list.';
       else rmQMsg = 'Could not load questions.json. Check your connection.';
       renderQuestion();
+      // no button: it quietly tries again a few times, and again whenever you come back to the app
+      if(rmQTries < 5){ rmQTries++; rmQTimer = setTimeout(function(){ if(rmQState === 'error') loadQuestions(true); }, 15000); }
     });
   }
+  document.addEventListener('visibilitychange', function(){
+    if(IS_REMOTE && !document.hidden && rmQState === 'error'){ rmQTries = 0; loadQuestions(true); }
+  });
 
   function renderQuestion(){
-    var txt = $('#rmQText'), ans = $('#rmQAns'), cnt = $('#rmQCount'), cat = $('#rmQCat');
+    var txt = $('#rmQText'), ans = $('#rmQAns'), cnt = $('#rmQCount');
     var prev = $('#rmQPrev'), next = $('#rmQNext'), act = $('#rmQAction');
     var n = rmQs.length;
-    ans.classList.add('hidden'); act.classList.add('hidden'); act.removeAttribute('data-mode');
-    cat.textContent = '';
+    ans.classList.add('hidden'); act.classList.add('hidden');
     txt.classList.remove('dim');
     prev.disabled = true; next.disabled = true;
     if(rmQState === 'loading'){
@@ -2790,17 +2964,15 @@
     } else if(rmQState === 'error' || rmQState === 'empty'){
       txt.textContent = rmQState === 'empty' ? 'questions.json has no questions in it yet.' : rmQMsg;
       txt.classList.add('dim'); cnt.textContent = 'Questions';
-      act.textContent = 'Try again'; act.setAttribute('data-mode', 'retry'); act.classList.remove('hidden');
     } else if(rmQIdx >= n){
       txt.textContent = 'That is all ' + n + ' question' + (n === 1 ? '' : 's') + '.';
       cnt.textContent = n + ' / ' + n;
-      act.textContent = 'Start over'; act.setAttribute('data-mode', 'restart'); act.classList.remove('hidden');
+      act.classList.remove('hidden');
       prev.disabled = false;
     } else {
       var it = rmQs[rmQIdx];
       txt.textContent = it.q;
       cnt.textContent = 'Q ' + (rmQIdx + 1) + ' / ' + n;
-      cat.textContent = it.c;
       if(it.a){ $('#rmQAnsText').textContent = it.a; ans.classList.remove('hidden'); }
       prev.disabled = rmQIdx === 0;
       next.disabled = false;
@@ -2876,14 +3048,9 @@
     on($('#rmMoreBtn'), 'click', function(){ $('#rmSheet').classList.remove('hidden'); });
     $('#rmQAdv').checked = rmQAdvance;
     on($('#rmQAdv'), 'change', function(){ rmQAdvance = $('#rmQAdv').checked; store.set('btc_q_adv', rmQAdvance ? '1' : '0'); });
-    on($('#rmQReload'), 'click', function(){ $('#rmSheet').classList.add('hidden'); loadQuestions(); });
     on($('#rmQPrev'), 'click', function(){ qStep(-1); });
     on($('#rmQNext'), 'click', function(){ qStep(1); });
-    on($('#rmQAction'), 'click', function(){
-      var mode = $('#rmQAction').getAttribute('data-mode');
-      if(mode === 'retry') loadQuestions();
-      else if(mode === 'restart'){ rmQIdx = 0; qSave(); renderQuestion(); }
-    });
+    on($('#rmQAction'), 'click', function(){ rmQIdx = 0; qSave(); renderQuestion(); }); // Start over
     window.addEventListener('resize', fitQuestionText);
     if(window.ResizeObserver){ new ResizeObserver(fitQuestionText).observe($('#rmQBody')); } // any change in the space available
     if(document.fonts && document.fonts.ready){ document.fonts.ready.then(fitQuestionText); }
@@ -2897,7 +3064,7 @@
     on($('#rmSortBtn'), 'click', function(){
       rmPlayers.sort(function(a, b){ return clampTime(b.time) - clampTime(a.time); });
       savePlayers(); renderPlayers(false);
-      setPmsg('Sorted by time, most first.');
+      setPmsg('Sorted by time, most first. Tap Send to display to apply it.');
     });
     on($('#rmAddBtn'), 'click', addPlayer);
     on($('#rmAddName'), 'keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); addPlayer(); } });
