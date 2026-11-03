@@ -1,52 +1,1002 @@
-{
-  "questions": [
+[
     {
-      "question": "What is the capital city of Australia?",
-      "answer": "Canberra"
+        "question": "Who wrote the novel \"Lord of the Flies\"?",
+        "answer": "William Golding"
     },
     {
-      "question": "How many sides does a hexagon have?",
-      "answer": "Six"
+        "question": "Which city hosted the 2008 Summer Olympics?",
+        "answer": "Beijing"
     },
     {
-      "question": "What is the chemical symbol for gold?",
-      "answer": "Au"
+        "question": "Which historical figure was executed by guillotine in 1793?",
+        "answer": "Marie Antoinette"
     },
     {
-      "question": "Which planet is known as the Red Planet?",
-      "answer": "Mars"
+        "question": "Who is the Norse god of mischief?",
+        "answer": "Loki"
     },
     {
-      "question": "Who painted the Mona Lisa?",
-      "answer": "Leonardo da Vinci"
+        "question": "Which band is known for the song \"Stairway to Heaven\"?",
+        "answer": "Led Zeppelin"
     },
     {
-      "question": "What is the largest ocean on Earth?",
-      "answer": "The Pacific Ocean"
+        "question": "What is the currency of Vietnam?",
+        "answer": "Dong"
     },
     {
-      "question": "In which year did the Titanic sink?",
-      "answer": "1912"
+        "question": "In which city would you find the Statue of Liberty?",
+        "answer": "New York City"
     },
     {
-      "question": "How many players from one team are on the field at a time in a soccer match?",
-      "answer": "Eleven"
+        "question": "What is the name of the longest bone in the human body?",
+        "answer": "Femur"
     },
     {
-      "question": "What is the hardest natural substance on Earth?",
-      "answer": "Diamond"
+        "question": "Which river forms part of the border between the US and Mexico?",
+        "answer": "Rio Grande"
     },
     {
-      "question": "Which country gave the Statue of Liberty to the United States?",
-      "answer": "France"
+        "question": "In which year was the United Nations founded?",
+        "answer": "1945"
     },
     {
-      "question": "Which gas do plants take in from the air for photosynthesis?",
-      "answer": "Carbon dioxide"
+        "question": "What is the name of the ship that carried the Pilgrims to America in 1620?",
+        "answer": "Mayflower"
     },
     {
-      "question": "What is the smallest prime number?",
-      "answer": "Two"
+        "question": "What is 99 doubled?",
+        "answer": "198"
+    },
+    {
+        "question": "Who played the role of Hannibal Lecter in \"The Silence of the Lambs\"?",
+        "answer": "Anthony Hopkins"
+    },
+    {
+        "question": "What is the main ingredient in hummus?",
+        "answer": "Chickpeas"
+    },
+    {
+        "question": "Which 2003 Pixar film features a family of clownfish?",
+        "answer": "Finding Nemo"
+    },
+    {
+        "question": "In which sport is the term \"offside\" commonly used?",
+        "answer": "Football"
+    },
+    {
+        "question": "Who directed the film \"Inception\"?",
+        "answer": "Christopher Nolan"
+    },
+    {
+        "question": "What is the name of the wizard in \"The Lord of the Rings\"?",
+        "answer": "Gandalf"
+    },
+    {
+        "question": "Who wrote the novel \"One Hundred Years of Solitude\"?",
+        "answer": "Gabriel García Márquez"
+    },
+    {
+        "question": "What is the name of the mountain range that runs along the western edge of South America?",
+        "answer": "Andes"
+    },
+    {
+        "question": "What is the primary source of energy for Earth's climate system?",
+        "answer": "Sun"
+    },
+    {
+        "question": "Which country is known for the ancient ruins of Angkor Wat?",
+        "answer": "Cambodia"
+    },
+    {
+        "question": "Which country is home to the Great Barrier Reef?",
+        "answer": "Australia"
+    },
+    {
+        "question": "Which country is known as the \"Land of a Thousand Lakes\"?",
+        "answer": "Finland"
+    },
+    {
+        "question": "What is the largest species of penguin?",
+        "answer": "Emperor penguin"
+    },
+    {
+        "question": "Which element is represented by the symbol Na on the periodic table?",
+        "answer": "Sodium"
+    },
+    {
+        "question": "What is the chemical formula for carbon dioxide?",
+        "answer": "CO₂"
+    },
+    {
+        "question": "What is the capital city of Iceland?",
+        "answer": "Reykjavik"
+    },
+    {
+        "question": "Which equine animal is known for its black and white stripes?",
+        "answer": "Zebra"
+    },
+    {
+        "question": "Which U.S. state is known as the \"Empire State\"?",
+        "answer": "New York"
+    },
+    {
+        "question": "Which Egyptian queen was married to Mark Antony?",
+        "answer": "Cleopatra"
+    },
+    {
+        "question": "Which scientist is known for the laws of planetary motion?",
+        "answer": "Johannes Kepler"
+    },
+    {
+        "question": "What is the name of the first book in the Bible?",
+        "answer": "Genesis"
+    },
+    {
+        "question": "Which planet has a moon named Europa?",
+        "answer": "Jupiter"
+    },
+    {
+        "question": "What is 81 divided by 3?",
+        "answer": "27"
+    },
+    {
+        "question": "Which planet is known for its prominent ring system?",
+        "answer": "Saturn"
+    },
+    {
+        "question": "Which element has the atomic number 1?",
+        "answer": "Hydrogen"
+    },
+    {
+        "question": "Which historical figure founded the Mongol Empire?",
+        "answer": "Genghis Khan"
+    },
+    {
+        "question": "Who painted \"Starry Night\"?",
+        "answer": "Vincent van Gogh"
+    },
+    {
+        "question": "Which country hosted the 2020 Summer Olympics, held in 2021?",
+        "answer": "Japan"
+    },
+    {
+        "question": "Which band is known for the song \"Purple Haze\"?",
+        "answer": "The Jimi Hendrix Experience"
+    },
+    {
+        "question": "In Greek mythology, who is the goddess of love?",
+        "answer": "Aphrodite"
+    },
+    {
+        "question": "What is the name of the currency used in China?",
+        "answer": "Yuan"
+    },
+    {
+        "question": "Which river flows through Budapest, Hungary?",
+        "answer": "Danube"
+    },
+    {
+        "question": "In which city would you find the Acropolis?",
+        "answer": "Athens"
+    },
+    {
+        "question": "What is the name of the bone commonly called the collarbone?",
+        "answer": "Clavicle"
+    },
+    {
+        "question": "In which year did the Spanish Civil War begin?",
+        "answer": "1936"
+    },
+    {
+        "question": "What is the name of the first man to walk on the moon?",
+        "answer": "Neil Armstrong"
+    },
+    {
+        "question": "Who played the role of Harry Potter in the film series?",
+        "answer": "Daniel Radcliffe"
+    },
+    {
+        "question": "In which sport is the term \"knockout\" used for a decisive victory?",
+        "answer": "Boxing"
+    },
+    {
+        "question": "What is the main ingredient in tabbouleh?",
+        "answer": "Parsley"
+    },
+    {
+        "question": "Which 1968 film features a supercomputer named HAL 9000?",
+        "answer": "2001: A Space Odyssey"
+    },
+    {
+        "question": "Who directed the film \"Blade Runner\"?",
+        "answer": "Ridley Scott"
+    },
+    {
+        "question": "Who wrote the novel \"Dracula\"?",
+        "answer": "Bram Stoker"
+    },
+    {
+        "question": "What is the name of the desert in southern Africa?",
+        "answer": "Kalahari"
+    },
+    {
+        "question": "Which country is famous for the ancient ruins of Machu Picchu?",
+        "answer": "Peru"
+    },
+    {
+        "question": "Which African country has the most pyramids?",
+        "answer": "Sudan"
+    },
+    {
+        "question": "Which country is known as the \"Land of Fire and Ice\"?",
+        "answer": "Iceland"
+    },
+    {
+        "question": "What is the name of the largest ocean on Earth?",
+        "answer": "Pacific Ocean"
+    },
+    {
+        "question": "Fe is the chemical symbol for which element?",
+        "answer": "Iron"
+    },
+    {
+        "question": "What is the chemical formula for table salt?",
+        "answer": "NaCl"
+    },
+    {
+        "question": "What is the capital city of Thailand?",
+        "answer": "Bangkok"
+    },
+    {
+        "question": "Which Roman emperor built a famous wall in Britain?",
+        "answer": "Hadrian"
+    },
+    {
+        "question": "Which animal is known for its long neck and spots?",
+        "answer": "Giraffe"
+    },
+    {
+        "question": "Who is known as the \"Father of the Computer\"?",
+        "answer": "Charles Babbage"
+    },
+    {
+        "question": "Which scientist formulated the theory of electromagnetism?",
+        "answer": "James Clerk Maxwell"
+    },
+    {
+        "question": "Which band is known for the song \"Wonderwall\"?",
+        "answer": "Oasis"
+    },
+    {
+        "question": "What is the name of the currency used in Switzerland?",
+        "answer": "Swiss Franc"
+    },
+    {
+        "question": "Which planet has a moon named Oberon?",
+        "answer": "Uranus"
+    },
+    {
+        "question": "What is the name of the river that flows through Rome?",
+        "answer": "Tiber"
+    },
+    {
+        "question": "In which year was the first modern Olympic Games held?",
+        "answer": "1896"
+    },
+    {
+        "question": "What is the atomic number of oxygen?",
+        "answer": "8"
+    },
+    {
+        "question": "Who played the role of Darth Vader's voice in the \"Star Wars\" films?",
+        "answer": "James Earl Jones"
+    },
+    {
+        "question": "Which sport is played at the Super Bowl?",
+        "answer": "American football"
+    },
+    {
+        "question": "Which Viking explorer is credited with discovering North America around 1000 AD?",
+        "answer": "Leif Erikson"
+    },
+    {
+        "question": "Who directed the film \"The Godfather\"?",
+        "answer": "Francis Ford Coppola"
+    },
+    {
+        "question": "Who wrote the novel \"Frankenstein\"?",
+        "answer": "Mary Shelley"
+    },
+    {
+        "question": "Which country is known for the ancient ruins of Chichen Itza?",
+        "answer": "Mexico"
+    },
+    {
+        "question": "What is 7 times 8?",
+        "answer": "56"
+    },
+    {
+        "question": "Which gas is the second most abundant element in the universe?",
+        "answer": "Helium"
+    },
+    {
+        "question": "What is the primary language spoken in Brazil?",
+        "answer": "Portuguese"
+    },
+    {
+        "question": "What is the largest species of lizard?",
+        "answer": "Komodo dragon"
+    },
+    {
+        "question": "Which element has the chemical symbol K?",
+        "answer": "Potassium"
+    },
+    {
+        "question": "What is the capital city of Argentina?",
+        "answer": "Buenos Aires"
+    },
+    {
+        "question": "Which pharaoh is famous for his intact tomb discovered in 1922?",
+        "answer": "Tutankhamun"
+    },
+    {
+        "question": "Which country is known for the ancient city of Petra?",
+        "answer": "Jordan"
+    },
+    {
+        "question": "Which English king had six wives?",
+        "answer": "Henry VIII"
+    },
+    {
+        "question": "Which historical figure was known as the \"Maid of Orléans\"?",
+        "answer": "Joan of Arc"
+    },
+    {
+        "question": "Which band is known for the song \"Back in Black\"?",
+        "answer": "AC/DC"
+    },
+    {
+        "question": "Which U.S. state is known as the \"Sunshine State\"?",
+        "answer": "Florida"
+    },
+    {
+        "question": "Which planet is known as the Red Planet?",
+        "answer": "Mars"
+    },
+    {
+        "question": "What is the currency of Thailand?",
+        "answer": "Baht"
+    },
+    {
+        "question": "Who painted the \"Mona Lisa\"?",
+        "answer": "Leonardo da Vinci"
+    },
+    {
+        "question": "Which river flows through Lisbon, Portugal?",
+        "answer": "Tagus"
+    },
+    {
+        "question": "Which country hosted the 2016 Summer Olympics?",
+        "answer": "Brazil"
+    },
+    {
+        "question": "In Greek mythology, who is the god of war?",
+        "answer": "Ares"
+    },
+    {
+        "question": "In which year was the Magna Carta signed?",
+        "answer": "1215"
+    },
+    {
+        "question": "What is the sum of the first three prime numbers?",
+        "answer": "10"
+    },
+    {
+        "question": "In which city is the Eiffel Tower located?",
+        "answer": "Paris"
+    },
+    {
+        "question": "Who played the role of Maximus in \"Gladiator\"?",
+        "answer": "Russell Crowe"
+    },
+    {
+        "question": "In which organ of the body is insulin produced?",
+        "answer": "Pancreas"
+    },
+    {
+        "question": "What is the main ingredient in guacamole?",
+        "answer": "Avocado"
+    },
+    {
+        "question": "In which sport is the term \"slalom\" used?",
+        "answer": "Skiing"
+    },
+    {
+        "question": "Which 1997 film features a romance between Jack and Rose aboard a doomed ship?",
+        "answer": "Titanic"
+    },
+    {
+        "question": "Who directed the film \"Good Will Hunting\"?",
+        "answer": "Gus Van Sant"
+    },
+    {
+        "question": "What is the name of the wizarding school in the \"Harry Potter\" series?",
+        "answer": "Hogwarts"
+    },
+    {
+        "question": "What is the name of the desert that covers much of northern Africa?",
+        "answer": "Sahara"
+    },
+    {
+        "question": "Who wrote the poem \"The Raven\"?",
+        "answer": "Edgar Allan Poe"
+    },
+    {
+        "question": "Which African country is known as the \"Rainbow Nation\"?",
+        "answer": "South Africa"
+    },
+    {
+        "question": "What is the largest species of dolphin?",
+        "answer": "Orca"
+    },
+    {
+        "question": "Which animal is known as the \"King of the Jungle\"?",
+        "answer": "Lion"
+    },
+    {
+        "question": "Which scientist proposed the theory of evolution by natural selection?",
+        "answer": "Charles Darwin"
+    },
+    {
+        "question": "What is the chemical symbol for tungsten?",
+        "answer": "W"
+    },
+    {
+        "question": "What gas makes up about 78% of Earth's atmosphere?",
+        "answer": "Nitrogen"
+    },
+    {
+        "question": "What is the capital city of Kenya?",
+        "answer": "Nairobi"
+    },
+    {
+        "question": "In which country was the car manufacturer Volvo founded?",
+        "answer": "Sweden"
+    },
+    {
+        "question": "Which country is known for the ancient ruins of Pompeii?",
+        "answer": "Italy"
+    },
+    {
+        "question": "Which band performed the hit song \"Bohemian Rhapsody\"?",
+        "answer": "Queen"
+    },
+    {
+        "question": "Which U.S. state is known as the \"Golden State\"?",
+        "answer": "California"
+    },
+    {
+        "question": "Which historical figure led the Bolshevik Revolution in 1917?",
+        "answer": "Vladimir Lenin"
+    },
+    {
+        "question": "What is the currency of Japan?",
+        "answer": "Yen"
+    },
+    {
+        "question": "Which river flows through Dublin, Ireland?",
+        "answer": "Liffey"
+    },
+    {
+        "question": "In Norse mythology, who is the god of thunder?",
+        "answer": "Thor"
+    },
+    {
+        "question": "In which year did the Titanic sink?",
+        "answer": "1912"
+    },
+    {
+        "question": "Who played the role of the Joker in \"The Dark Knight\"?",
+        "answer": "Heath Ledger"
+    },
+    {
+        "question": "In which city would you find the Colosseum?",
+        "answer": "Rome"
+    },
+    {
+        "question": "In which sport is the term \"scrum\" used?",
+        "answer": "Rugby"
+    },
+    {
+        "question": "Which fruit is known as the \"king of fruits\" and is famous for its strong smell?",
+        "answer": "Durian"
+    },
+    {
+        "question": "Which 1980s TV show featured a talking car named KITT?",
+        "answer": "Knight Rider"
+    },
+    {
+        "question": "Who directed the film \"E.T. the Extra-Terrestrial\"?",
+        "answer": "Steven Spielberg"
+    },
+    {
+        "question": "What is the name of the fictional detective created by Arthur Conan Doyle?",
+        "answer": "Sherlock Holmes"
+    },
+    {
+        "question": "Who wrote the novel \"A Clockwork Orange\"?",
+        "answer": "Anthony Burgess"
+    },
+    {
+        "question": "Which country is known for the dance called the tango?",
+        "answer": "Argentina"
+    },
+    {
+        "question": "What is the largest mammal in the world?",
+        "answer": "Blue whale"
+    },
+    {
+        "question": "What is the capital city of Morocco?",
+        "answer": "Rabat"
+    },
+    {
+        "question": "Which scientist discovered penicillin?",
+        "answer": "Alexander Fleming"
+    },
+    {
+        "question": "Which country is known for the ancient city of Carthage?",
+        "answer": "Tunisia"
+    },
+    {
+        "question": "What is the square root of 64?",
+        "answer": "8"
+    },
+    {
+        "question": "What is the name of the strait that separates Europe and Africa?",
+        "answer": "Gibraltar"
+    },
+    {
+        "question": "Which band released the album \"Rumours\"?",
+        "answer": "Fleetwood Mac"
+    },
+    {
+        "question": "Which U.S. state is known as the \"Lone Star State\"?",
+        "answer": "Texas"
+    },
+    {
+        "question": "What is the name of the currency used in Mexico?",
+        "answer": "Peso"
+    },
+    {
+        "question": "Which historical figure was the last Tsar of Russia?",
+        "answer": "Nicholas II"
+    },
+    {
+        "question": "What is the name of the river that flows through London?",
+        "answer": "Thames"
+    },
+    {
+        "question": "In which year did the Cuban Missile Crisis occur?",
+        "answer": "1962"
+    },
+    {
+        "question": "Who is the Greek goddess of wisdom?",
+        "answer": "Athena"
+    },
+    {
+        "question": "Who played Jack Sparrow in the \"Pirates of the Caribbean\" films?",
+        "answer": "Johnny Depp"
+    },
+    {
+        "question": "In which sport is the term \"bogey\" used?",
+        "answer": "Golf"
+    },
+    {
+        "question": "Which 1994 Disney film features a character named Simba?",
+        "answer": "The Lion King"
+    },
+    {
+        "question": "Who directed the film \"The Grand Budapest Hotel\"?",
+        "answer": "Wes Anderson"
+    },
+    {
+        "question": "What is the name of the fictional continent in \"Game of Thrones\"?",
+        "answer": "Westeros"
+    },
+    {
+        "question": "Who wrote the novel \"Pride and Prejudice\"?",
+        "answer": "Jane Austen"
+    },
+    {
+        "question": "Which country is known for the ancient ruins of Knossos?",
+        "answer": "Greece"
+    },
+    {
+        "question": "Which country is known as the \"Land of the Rising Sun\"?",
+        "answer": "Japan"
+    },
+    {
+        "question": "Which band is known for the song \"Don't Stop Believin'\"?",
+        "answer": "Journey"
+    },
+    {
+        "question": "What is the smallest country in the world by land area?",
+        "answer": "Vatican City"
+    },
+    {
+        "question": "What is the capital city of Brazil?",
+        "answer": "Brasília"
+    },
+    {
+        "question": "What is the currency of Indonesia?",
+        "answer": "Rupiah"
+    },
+    {
+        "question": "Which scientist is known for the theory of relativity?",
+        "answer": "Albert Einstein"
+    },
+    {
+        "question": "Which historical figure was known as the \"Sun King\"?",
+        "answer": "Louis XIV"
+    },
+    {
+        "question": "In which country is the Taj Mahal located?",
+        "answer": "India"
+    },
+    {
+        "question": "Which river flows through Prague, Czech Republic?",
+        "answer": "Vltava"
+    },
+    {
+        "question": "In which year did World War II end?",
+        "answer": "1945"
+    },
+    {
+        "question": "In Roman mythology, who is the god of the sea?",
+        "answer": "Neptune"
+    },
+    {
+        "question": "Who played the role of Sarah Connor in \"Terminator 2: Judgment Day\"?",
+        "answer": "Linda Hamilton"
+    },
+    {
+        "question": "In which sport would you perform a slam dunk?",
+        "answer": "Basketball"
+    },
+    {
+        "question": "Who directed the film \"La La Land\"?",
+        "answer": "Damien Chazelle"
+    },
+    {
+        "question": "Who is the author of \"The Great Gatsby\"?",
+        "answer": "F. Scott Fitzgerald"
+    },
+    {
+        "question": "Which country is known for the dance called the flamenco?",
+        "answer": "Spain"
+    },
+    {
+        "question": "Which band is known for the song \"Paint It Black\"?",
+        "answer": "The Rolling Stones"
+    },
+    {
+        "question": "What is the largest planet in our solar system?",
+        "answer": "Jupiter"
+    },
+    {
+        "question": "What is the currency of Malaysia?",
+        "answer": "Ringgit"
+    },
+    {
+        "question": "What is the capital city of Australia?",
+        "answer": "Canberra"
+    },
+    {
+        "question": "What is the name of the river that flows through Paris?",
+        "answer": "Seine"
+    },
+    {
+        "question": "Which historical figure was the first female Prime Minister of the UK?",
+        "answer": "Margaret Thatcher"
+    },
+    {
+        "question": "In which year did the American Declaration of Independence get adopted?",
+        "answer": "1776"
+    },
+    {
+        "question": "Who played the role of Trinity in \"The Matrix\"?",
+        "answer": "Carrie-Anne Moss"
+    },
+    {
+        "question": "Who is the Roman goddess of love?",
+        "answer": "Venus"
+    },
+    {
+        "question": "In which sport would you perform a triple axel?",
+        "answer": "Figure skating"
+    },
+    {
+        "question": "Who directed the film \"Psycho\"?",
+        "answer": "Alfred Hitchcock"
+    },
+    {
+        "question": "Who wrote the novel \"1984\"?",
+        "answer": "George Orwell"
+    },
+    {
+        "question": "Which band is known for the song \"Comfortably Numb\"?",
+        "answer": "Pink Floyd"
+    },
+    {
+        "question": "Which animal is the fastest land mammal?",
+        "answer": "Cheetah"
+    },
+    {
+        "question": "What is the currency of South Korea?",
+        "answer": "Won"
+    },
+    {
+        "question": "What is the capital city of Canada?",
+        "answer": "Ottawa"
+    },
+    {
+        "question": "What is the name of the river that flows through Cairo?",
+        "answer": "Nile"
+    },
+    {
+        "question": "Which historical figure was known as the \"Great Emancipator\"?",
+        "answer": "Abraham Lincoln"
+    },
+    {
+        "question": "In which year did the Berlin Wall fall?",
+        "answer": "1989"
+    },
+    {
+        "question": "Who played the role of Clarice Starling in \"The Silence of the Lambs\"?",
+        "answer": "Jodie Foster"
+    },
+    {
+        "question": "In Greek mythology, who is the god of wine?",
+        "answer": "Dionysus"
+    },
+    {
+        "question": "In which sport would you perform a googly?",
+        "answer": "Cricket"
+    },
+    {
+        "question": "Who wrote the play \"The Crucible\"?",
+        "answer": "Arthur Miller"
+    },
+    {
+        "question": "What is 71 minus 22?",
+        "answer": "49"
+    },
+    {
+        "question": "Who directed the film \"The Shawshank Redemption\"?",
+        "answer": "Frank Darabont"
+    },
+    {
+        "question": "What is the currency of Egypt?",
+        "answer": "Egyptian pound"
+    },
+    {
+        "question": "Which band is known for the album \"Abbey Road\"?",
+        "answer": "The Beatles"
+    },
+    {
+        "question": "Which country is the largest producer of coffee in the world?",
+        "answer": "Brazil"
+    },
+    {
+        "question": "Which river flows through Warsaw, Poland?",
+        "answer": "Vistula"
+    },
+    {
+        "question": "What is the capital city of Egypt?",
+        "answer": "Cairo"
+    },
+    {
+        "question": "Which historical figure led the Haitian Revolution?",
+        "answer": "Toussaint Louverture"
+    },
+    {
+        "question": "In which year did the first iPhone launch?",
+        "answer": "2007"
+    },
+    {
+        "question": "Who played the role of Tony Stark in the \"Iron Man\" films?",
+        "answer": "Robert Downey Jr."
+    },
+    {
+        "question": "In which sport is the term \"deuce\" used?",
+        "answer": "Tennis"
+    },
+    {
+        "question": "Who wrote the novel \"To Kill a Mockingbird\"?",
+        "answer": "Harper Lee"
+    },
+    {
+        "question": "What is the currency of Sweden?",
+        "answer": "Krona"
+    },
+    {
+        "question": "Who directed the film \"Pulp Fiction\"?",
+        "answer": "Quentin Tarantino"
+    },
+    {
+        "question": "Which river flows through Buenos Aires, Argentina?",
+        "answer": "Río de la Plata"
+    },
+    {
+        "question": "Which band is known for the song \"Sweet Child O' Mine\"?",
+        "answer": "Guns N' Roses"
+    },
+    {
+        "question": "What is the smallest planet in our solar system?",
+        "answer": "Mercury"
+    },
+    {
+        "question": "Which historical figure was the first Emperor of China?",
+        "answer": "Qin Shi Huang"
+    },
+    {
+        "question": "What is the capital city of Russia?",
+        "answer": "Moscow"
+    },
+    {
+        "question": "In which year did the Battle of Waterloo take place?",
+        "answer": "1815"
+    },
+    {
+        "question": "Who played the role of Katniss Everdeen in \"The Hunger Games\" films?",
+        "answer": "Jennifer Lawrence"
+    },
+    {
+        "question": "In which sport would you use a pommel horse?",
+        "answer": "Gymnastics"
+    },
+    {
+        "question": "Who wrote the novel \"The Picture of Dorian Gray\"?",
+        "answer": "Oscar Wilde"
+    },
+    {
+        "question": "What is the name of the currency used in India?",
+        "answer": "Rupee"
+    },
+    {
+        "question": "Which river flows through Amsterdam, Netherlands?",
+        "answer": "Amstel"
+    },
+    {
+        "question": "Which band is known for the song \"Hotel California\"?",
+        "answer": "Eagles"
+    },
+    {
+        "question": "What is the largest organ in the human body?",
+        "answer": "Skin"
+    },
+    {
+        "question": "Which historical figure was known as the \"Iron Chancellor\"?",
+        "answer": "Otto von Bismarck"
+    },
+    {
+        "question": "What is the capital city of South Korea?",
+        "answer": "Seoul"
+    },
+    {
+        "question": "In which year did the American Civil War end?",
+        "answer": "1865"
+    },
+    {
+        "question": "Who played the role of Forrest Gump in the 1994 film?",
+        "answer": "Tom Hanks"
+    },
+    {
+        "question": "Who wrote the novel \"Moby-Dick\"?",
+        "answer": "Herman Melville"
+    },
+    {
+        "question": "In which sport is the term \"chukkas\" used?",
+        "answer": "Polo"
+    },
+    {
+        "question": "What is the name of the currency used in South Africa?",
+        "answer": "Rand"
+    },
+    {
+        "question": "Which historical figure was the first President of South Africa after apartheid?",
+        "answer": "Nelson Mandela"
+    },
+    {
+        "question": "What is the name of the river that flows through Washington, D.C.?",
+        "answer": "Potomac"
+    },
+    {
+        "question": "In which year did the Battle of Hastings occur?",
+        "answer": "1066"
+    },
+    {
+        "question": "Which band is known for the song \"Smells Like Teen Spirit\"?",
+        "answer": "Nirvana"
+    },
+    {
+        "question": "What is the name of the largest bone in the human arm?",
+        "answer": "Humerus"
+    },
+    {
+        "question": "Who played the role of Rick Blaine in \"Casablanca\"?",
+        "answer": "Humphrey Bogart"
+    },
+    {
+        "question": "Who wrote the novel \"Jane Eyre\"?",
+        "answer": "Charlotte Brontë"
+    },
+    {
+        "question": "What is the currency of Turkey?",
+        "answer": "Lira"
+    },
+    {
+        "question": "In which year did the French Revolution begin?",
+        "answer": "1789"
+    },
+    {
+        "question": "Which artist is known for the song \"Billie Jean\"?",
+        "answer": "Michael Jackson"
+    },
+    {
+        "question": "Which historical figure was known as the \"Virgin Queen\"?",
+        "answer": "Elizabeth I"
+    },
+    {
+        "question": "Which country is the smallest in South America by land area?",
+        "answer": "Suriname"
+    },
+    {
+        "question": "Who played the role of Michael Corleone in \"The Godfather\"?",
+        "answer": "Al Pacino"
+    },
+    {
+        "question": "Who wrote the novel \"The Catcher in the Rye\"?",
+        "answer": "J.D. Salinger"
+    },
+    {
+        "question": "What is the name of the currency used in Russia?",
+        "answer": "Rubles"
+    },
+    {
+        "question": "In which year did the Tiananmen Square protests occur?",
+        "answer": "1989"
+    },
+    {
+        "question": "Who played the role of Neo in \"The Matrix\" films?",
+        "answer": "Keanu Reeves"
+    },
+    {
+        "question": "Who wrote the novel \"Ulysses\"?",
+        "answer": "James Joyce"
+    },
+    {
+        "question": "In which year was the first Harry Potter book published?",
+        "answer": "1997"
+    },
+    {
+        "question": "Who wrote the novel \"Wuthering Heights\"?",
+        "answer": "Emily Brontë"
+    },
+    {
+        "question": "What is the currency of Norway?",
+        "answer": "Krone"
+    },
+    {
+        "question": "In which year did the first man land on the moon?",
+        "answer": "1969"
+    },
+    {
+        "question": "Who wrote the novel \"Slaughterhouse-Five\"?",
+        "answer": "Kurt Vonnegut"
+    },
+    {
+        "question": "Who painted the ceiling of the Sistine Chapel?",
+        "answer": "Michelangelo"
     }
-  ]
-}
+]
