@@ -778,6 +778,68 @@
   .rm-pmsg.ok{ color:var(--teal); }
   .rm-pmsg.bad{ color:var(--red); }
   @media (max-height:480px){ .rm-phead .rm-sheet-title{ display:none; } .rm-sheet.full .rm-sheet-inner{ height:calc(100% - 6px); } }
+
+  /* ---------- remote: question reader (reads questions.json) ---------- */
+  .rm-top{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
+  .rm-reader{
+    flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:8px;
+    background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:10px 12px 12px;
+  }
+  .rm-rhead{ flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:20px; }
+  .rm-rcount{ font-family:var(--font-mono); font-size:0.76rem; font-weight:700; letter-spacing:0.06em; color:var(--muted); }
+  .rm-rcat{
+    font-size:0.66rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold);
+    background:var(--gold-soft); border-radius:999px; padding:3px 10px; max-width:58%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .rm-rcat:empty{ display:none; }
+  .rm-rbody{
+    flex:1 1 0; min-height:0; overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column;
+    --qfs:24px; -webkit-overflow-scrolling:touch;
+  }
+  .rm-rbody::-webkit-scrollbar{ display:none; }
+  .rm-qwrap{ margin:auto 0; display:flex; flex-direction:column; gap:0.5em; text-align:center; }
+  .rm-qtext{ font-size:var(--qfs); line-height:1.22; font-weight:700; color:var(--paper); overflow-wrap:anywhere; }
+  .rm-qtext.dim{ color:var(--muted); font-weight:600; }
+  .rm-qans{
+    border-top:1px solid var(--line); padding-top:0.5em;
+    font-size:calc(var(--qfs) * 0.72); line-height:1.25; color:var(--teal); font-weight:700; overflow-wrap:anywhere;
+  }
+  .rm-qlabel{
+    display:block; font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--muted); font-weight:800; margin-bottom:2px;
+  }
+  .rm-rnav{ flex:0 0 auto; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .rm-qbtn{
+    height:40px; border-radius:11px; border:1px solid var(--line); background:var(--panel-2); color:var(--paper);
+    font-family:var(--font-body); font-weight:800; font-size:0.88rem; cursor:pointer;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  }
+  .rm-qbtn:active{ transform:scale(0.97); }
+  .rm-qbtn:disabled{ opacity:0.3; }
+  .rm-qbtn.action{
+    align-self:center; margin-top:8px; padding:0 18px; height:38px;
+    background:var(--teal); border-color:var(--teal); color:#062a33;
+  }
+  /* the Correct button is now a quarter of its old size; the reader takes the rest of that space */
+  .rm-correct{
+    flex:0 0 25%; height:auto; min-height:0; white-space:nowrap; border-radius:18px;
+    font-size:2rem; font-size:clamp(1.4rem, min(8vw, 4.6dvh), 2.4rem);
+    box-shadow:0 0 0 3px var(--teal-soft);
+  }
+  .rm-qset{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .rm-toggle{ display:flex; align-items:center; gap:10px; font-size:0.88rem; font-weight:600; color:var(--paper); }
+  .rm-toggle input{ width:22px; height:22px; accent-color:var(--teal); margin:0; }
+  .rm-qset .rc-linkbtn{ margin:0; padding:6px 2px; }
+  @media (max-height:480px){
+    .rm-rhead{ display:none; }
+    .rm-qbtn{ height:32px; }
+    .rm-correct{ flex:0 0 auto; height:44px; }
+  }
+
+  /* header never changes height (a wrapping status pill used to nudge everything below it) */
+  .rm-status{ min-width:0; white-space:nowrap; overflow:hidden; }
+  .rm-status #rmStatusText{ overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
@@ -938,7 +1000,26 @@
   </div>
 
   <div class="rm-pad hidden" id="rmPad">
-    <button type="button" class="rm-btn rm-correct" data-rm="correct" aria-label="Correct answer">✓ CORRECT</button>
+    <div class="rm-top">
+      <section class="rm-reader" aria-label="Question reader">
+        <div class="rm-rhead">
+          <span class="rm-rcount" id="rmQCount">Questions</span>
+          <span class="rm-rcat" id="rmQCat"></span>
+        </div>
+        <div class="rm-rbody" id="rmQBody">
+          <div class="rm-qwrap">
+            <div class="rm-qtext dim" id="rmQText">Loading questions…</div>
+            <div class="rm-qans hidden" id="rmQAns"><span class="rm-qlabel">Answer</span><span id="rmQAnsText"></span></div>
+            <button type="button" class="rm-qbtn action hidden" id="rmQAction">Try again</button>
+          </div>
+        </div>
+        <div class="rm-rnav">
+          <button type="button" class="rm-qbtn" id="rmQPrev" aria-label="Previous question" disabled>◀ Prev</button>
+          <button type="button" class="rm-qbtn" id="rmQNext" aria-label="Next question" disabled>Next ▶</button>
+        </div>
+      </section>
+      <button type="button" class="rm-btn rm-correct" data-rm="correct" aria-label="Correct answer">✓ CORRECT</button>
+    </div>
     <div class="rm-last" id="rmLast" aria-live="polite"></div>
     <div class="rm-grid">
       <button type="button" class="rm-btn rm-gold" data-rm="start-clock">▶ Start clock</button>
@@ -968,6 +1049,10 @@
           <input type="number" id="rmSet" value="60" min="1" step="1" inputmode="numeric" aria-label="Seconds to set all clocks to">
           <button type="button" class="btn btn-teal" id="rmSetBtn">Set</button>
         </div>
+      </div>
+      <div class="rm-qset">
+        <label class="rm-toggle"><input type="checkbox" id="rmQAdv" checked> Next question after Correct</label>
+        <button type="button" class="rc-linkbtn" id="rmQReload">Reload questions</button>
       </div>
       <div class="rm-last" id="rmSheetLast" aria-live="polite"></div>
       <button type="button" class="rm-btn" id="rmNewGame">New game</button>
@@ -2474,6 +2559,7 @@
     rmLink.start();
     updateRemoteStatus();
     requestWake();
+    fitQuestionText();
   }
 
   function sendCmd(cmd, arg, label, btn){
@@ -2616,6 +2702,130 @@
     }
   }
 
+  /* ---- question reader (phone): reads questions.json from the same folder as this page ----
+     Accepted shapes:  [ {question, answer, category}, ... ]   or   { "questions": [ ... ] }
+     Also accepted: plain strings, and the short keys q / a. "answer" may be a list. */
+  var QFILE = 'questions.json';
+  var rmQs = [], rmQIdx = 0, rmQState = 'loading', rmQMsg = '';
+  var rmQAdvance = store.get('btc_q_adv') !== '0';
+
+  function qStr(v){
+    if(Array.isArray(v)) v = v.filter(function(x){ return x !== null && x !== undefined && typeof x !== 'object'; }).join(' / ');
+    if(v === null || v === undefined || typeof v === 'object') return '';
+    return String(v).replace(/\s+/g, ' ').trim();
+  }
+  function qPick(o, keys){
+    for(var i = 0; i < keys.length; i++){
+      var v = o[keys[i]];
+      if(v !== null && v !== undefined && v !== '') return v;
+    }
+    return '';
+  }
+  function parseQuestions(data){
+    var arr = Array.isArray(data) ? data : (data && Array.isArray(data.questions) ? data.questions : null);
+    if(!arr) return null;
+    var out = [];
+    for(var i = 0; i < arr.length && out.length < 2000; i++){
+      var it = arr[i], q = '', a = '', c = '';
+      if(typeof it === 'string' || typeof it === 'number'){ q = qStr(it); }
+      else if(it && typeof it === 'object' && !Array.isArray(it)){
+        q = qStr(qPick(it, ['question', 'q', 'text', 'prompt', 'clue']));
+        a = qStr(qPick(it, ['answer', 'a', 'answers', 'solution']));
+        c = qStr(qPick(it, ['category', 'cat', 'round', 'topic', 'type']));
+      }
+      if(!q) continue;
+      out.push({ q:q.slice(0, 800), a:a.slice(0, 400), c:c.slice(0, 40) });
+    }
+    return out;
+  }
+  function qSig(){ return rmQs.length ? (rmQs.length + ':' + rmQs[0].q.slice(0, 40)) : ''; }
+  function qSave(){ store.set('btc_q_idx', String(rmQIdx)); }
+
+  function loadQuestions(){
+    rmQState = 'loading';
+    renderQuestion();
+    var url = QFILE;
+    try{ url = new URL(QFILE, window.location.href).toString(); }catch(e){}
+    var req;
+    try{ req = fetch(url, { cache:'no-cache' }); }catch(e){ req = Promise.reject(e); }
+    req.then(function(res){
+      if(!res.ok){ var er = new Error('http'); er.kind = 'http'; er.status = res.status; throw er; }
+      return res.text();
+    }).then(function(text){
+      var data;
+      try{ data = JSON.parse(text.replace(/^\uFEFF/, '')); }
+      catch(e){ var er = new Error('json'); er.kind = 'json'; throw er; }
+      var list = parseQuestions(data);
+      if(!list){ var er2 = new Error('shape'); er2.kind = 'shape'; throw er2; }
+      rmQs = list;
+      var sig = qSig();
+      var saved = parseInt(store.get('btc_q_idx'), 10);
+      // keep your place across reloads, but start again if the file was changed
+      rmQIdx = (sig && store.get('btc_q_sig') === sig && saved >= 0) ? Math.min(saved, rmQs.length) : 0;
+      store.set('btc_q_sig', sig);
+      qSave();
+      rmQState = rmQs.length ? 'ok' : 'empty';
+      renderQuestion();
+    }).catch(function(err){
+      rmQState = 'error';
+      if(err && err.kind === 'http' && err.status === 404) rmQMsg = 'Could not find questions.json. Put it in the same folder as index.html.';
+      else if(err && err.kind === 'http') rmQMsg = 'Could not load questions.json (error ' + err.status + ').';
+      else if(err && err.kind === 'json') rmQMsg = 'questions.json is not valid JSON. Check for a missing comma or quote.';
+      else if(err && err.kind === 'shape') rmQMsg = 'questions.json should be a list of questions, or an object with a "questions" list.';
+      else rmQMsg = 'Could not load questions.json. Check your connection.';
+      renderQuestion();
+    });
+  }
+
+  function renderQuestion(){
+    var txt = $('#rmQText'), ans = $('#rmQAns'), cnt = $('#rmQCount'), cat = $('#rmQCat');
+    var prev = $('#rmQPrev'), next = $('#rmQNext'), act = $('#rmQAction');
+    var n = rmQs.length;
+    ans.classList.add('hidden'); act.classList.add('hidden'); act.removeAttribute('data-mode');
+    cat.textContent = '';
+    txt.classList.remove('dim');
+    prev.disabled = true; next.disabled = true;
+    if(rmQState === 'loading'){
+      txt.textContent = 'Loading questions…'; txt.classList.add('dim'); cnt.textContent = 'Questions';
+    } else if(rmQState === 'error' || rmQState === 'empty'){
+      txt.textContent = rmQState === 'empty' ? 'questions.json has no questions in it yet.' : rmQMsg;
+      txt.classList.add('dim'); cnt.textContent = 'Questions';
+      act.textContent = 'Try again'; act.setAttribute('data-mode', 'retry'); act.classList.remove('hidden');
+    } else if(rmQIdx >= n){
+      txt.textContent = 'That is all ' + n + ' question' + (n === 1 ? '' : 's') + '.';
+      cnt.textContent = n + ' / ' + n;
+      act.textContent = 'Start over'; act.setAttribute('data-mode', 'restart'); act.classList.remove('hidden');
+      prev.disabled = false;
+    } else {
+      var it = rmQs[rmQIdx];
+      txt.textContent = it.q;
+      cnt.textContent = 'Q ' + (rmQIdx + 1) + ' / ' + n;
+      cat.textContent = it.c;
+      if(it.a){ $('#rmQAnsText').textContent = it.a; ans.classList.remove('hidden'); }
+      prev.disabled = rmQIdx === 0;
+      next.disabled = false;
+    }
+    fitQuestionText();
+  }
+
+  // shrink the text until the question and answer fit the space available, so nothing needs scrolling
+  function fitQuestionText(){
+    var body = $('#rmQBody');
+    if(!body || !body.offsetParent) return;
+    var fs = Math.max(14, Math.min(34, Math.round(body.clientWidth / 9)));
+    body.style.setProperty('--qfs', fs + 'px');
+    while(fs > 12 && body.scrollHeight > body.clientHeight + 1){
+      fs -= 1;
+      body.style.setProperty('--qfs', fs + 'px');
+    }
+  }
+  function qStep(d){
+    if(rmQState !== 'ok') return;
+    rmQIdx = Math.max(0, Math.min(rmQs.length, rmQIdx + d));
+    qSave();
+    renderQuestion();
+  }
+
   function initRemoteMode(){
     document.body.classList.add('is-remote');
     document.title = 'Beat the Clock Remote';
@@ -2625,7 +2835,8 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-rm]'), function(btn){
       on(btn, 'click', function(){
         var cmd = btn.getAttribute('data-rm');
-        sendCmd(cmd, undefined, btn.textContent.replace(/^[^\w]+/, '').trim() || cmd, btn);
+        var sent = sendCmd(cmd, undefined, btn.textContent.replace(/^[^\w]+/, '').trim() || cmd, btn);
+        if(cmd === 'correct' && sent > 0 && rmQAdvance) qStep(1); // next player, next question
       });
     });
     on($('#rmBonusBtn'), 'click', function(){
@@ -2663,6 +2874,19 @@
     on($('#rmShowGame'), 'click', goGame);
     on($('#rmShowGame2'), 'click', goGame);
     on($('#rmMoreBtn'), 'click', function(){ $('#rmSheet').classList.remove('hidden'); });
+    $('#rmQAdv').checked = rmQAdvance;
+    on($('#rmQAdv'), 'change', function(){ rmQAdvance = $('#rmQAdv').checked; store.set('btc_q_adv', rmQAdvance ? '1' : '0'); });
+    on($('#rmQReload'), 'click', function(){ $('#rmSheet').classList.add('hidden'); loadQuestions(); });
+    on($('#rmQPrev'), 'click', function(){ qStep(-1); });
+    on($('#rmQNext'), 'click', function(){ qStep(1); });
+    on($('#rmQAction'), 'click', function(){
+      var mode = $('#rmQAction').getAttribute('data-mode');
+      if(mode === 'retry') loadQuestions();
+      else if(mode === 'restart'){ rmQIdx = 0; qSave(); renderQuestion(); }
+    });
+    window.addEventListener('resize', fitQuestionText);
+    if(window.ResizeObserver){ new ResizeObserver(fitQuestionText).observe($('#rmQBody')); } // any change in the space available
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(fitQuestionText); }
     $('#rmAddTime').value = String(clampTime(store.get('btc_remote_time') || 60));
     on($('#rmPlayersBtn'), 'click', function(){
       renderPlayers(false);
@@ -2683,6 +2907,7 @@
     on($('#rmSheet'), 'click', function(e){ if(e.target.id === 'rmSheet') $('#rmSheet').classList.add('hidden'); });
     document.addEventListener('pointerdown', requestWake, { passive:true });
 
+    loadQuestions();
     var code = normCode(qs.get('remote'));
     if(!validCode(code)) code = normCode(store.get('btc_remote_code'));
     if(validCode(code)) connectRemote(code); else showPair('');
