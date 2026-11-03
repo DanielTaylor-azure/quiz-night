@@ -32,7 +32,7 @@
     --font-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
   }
   *{box-sizing:border-box;}
-  html,body{height:100%;}
+  html,body{height:100%; overflow:hidden;}
   body{
     margin:0;
     min-height:100vh;
@@ -46,12 +46,7 @@
     -webkit-font-smoothing:antialiased;
   }
   #app{
-    max-width:900px;
-    margin:0 auto;
-    padding:calc(20px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) calc(60px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+    position:fixed; inset:0; overflow:hidden;
   }
   .hidden{display:none !important;}
 
@@ -78,13 +73,13 @@
   .icon-btn:active{transform:scale(0.94);}
 
   /* ---------- generic screen / card ---------- */
-  .screen{flex:1; display:flex; flex-direction:column; animation:fadeIn .35s ease;}
+  .screen{display:flex; flex-direction:column; animation:fadeIn .35s ease;}
   @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
 
   .hero{text-align:center; padding:18px 0 6px;}
   .hero h1{
     font-family:var(--font-display);
-    font-size:clamp(2.6rem, 8vw, 4.2rem);
+    font-size:4rem;
     letter-spacing:0.03em;
     margin:0;
     line-height:0.95;
@@ -212,7 +207,7 @@
   }
   .stage-head h2{
     font-family:var(--font-display);
-    font-size:clamp(1.7rem,6vw,2.6rem);
+    font-size:2.4rem;
     letter-spacing:0.02em;
     margin:4px 0 0;
     font-weight:800;
@@ -264,7 +259,7 @@
   }
   .duel-side.out{ opacity:0.4; }
   .duel-name{
-    font-family:var(--font-display); font-size:clamp(1.1rem,4vw,1.5rem);
+    font-family:var(--font-display); font-size:1.5rem;
     letter-spacing:0.02em; color:#fff; margin-bottom:2px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
     text-shadow:0 1px 3px rgba(0,0,0,0.6);
@@ -272,7 +267,7 @@
   .duel-side.active .duel-name{ color:var(--teal); }
   .duel-clock{
     font-family:var(--font-mono); font-weight:700; font-variant-numeric:tabular-nums;
-    font-size:clamp(2.4rem, 11vw, 3.6rem); color:var(--paper); line-height:1;
+    font-size:3.5rem; color:var(--paper); line-height:1;
   }
   .duel-side.active .duel-clock{ color:var(--teal); }
   .duel-side .duel-clock.low{ color:var(--gold); }
@@ -318,7 +313,7 @@
   .clock-digits{
     font-family:var(--font-mono);
     font-weight:700;
-    font-size:clamp(2.4rem, 11vw, 3.6rem);
+    font-size:3.5rem;
     letter-spacing:0.02em;
     font-variant-numeric:tabular-nums;
     color:var(--teal);
@@ -399,10 +394,6 @@
   .adjust-divider{ width:1px; background:var(--line); flex:0 0 auto; }
   .adjust-note{ font-size:0.7rem; color:var(--muted); margin-top:8px; }
   .adjust-panel .btn:disabled{ opacity:0.6; }
-  @media(max-width:560px){
-    .adjust-panel{ flex-direction:column; }
-    .adjust-divider{ width:auto; height:1px; }
-  }
 
   #app.app-shake{animation:appShake .5s ease;}
   @keyframes appShake{
@@ -426,13 +417,12 @@
     0%,100%{box-shadow:0 0 0 0 rgba(231,183,64,0);}
     50%{box-shadow:0 0 26px 6px rgba(231,183,64,0.35);}
   }
-  .result-title{font-family:var(--font-display); font-size:clamp(2rem,7vw,2.9rem); letter-spacing:0.02em; color:var(--gold);}
+  .result-title{font-family:var(--font-display); font-size:2.7rem; letter-spacing:0.02em; color:var(--gold);}
   .result-sub{color:var(--muted); margin-top:6px; font-size:0.95rem;}
 
   .stats-grid{
     display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:22px;
   }
-  @media(max-width:560px){ .stats-grid{ grid-template-columns:1fr; } }
   .stat-card{
     background:linear-gradient(180deg, var(--gold-soft), transparent 75%), var(--panel);
     border:1px solid rgba(231,183,64,0.3); border-radius:14px; padding:16px; text-align:center;
@@ -590,18 +580,19 @@
   }
   .rc-linkbtn:hover{ color:var(--paper); }
 
-  /* ---------- remote (phone) screen ---------- */
+  /* ---------- remote (phone) screen: always fits the portrait screen, never scrolls ---------- */
   #remoteApp{
-    display:none; flex-direction:column; gap:12px;
-    max-width:560px; margin:0 auto;
-    min-height:100vh; min-height:100dvh;
-    padding:calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px))
-            calc(22px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px));
+    display:none; flex-direction:column; gap:10px;
+    position:relative; overflow:hidden;
+    width:100%; max-width:560px; margin:0 auto;
+    height:100vh; height:100dvh;
+    padding:calc(12px + env(safe-area-inset-top, 0px)) calc(14px + env(safe-area-inset-right, 0px))
+            calc(14px + env(safe-area-inset-bottom, 0px)) calc(14px + env(safe-area-inset-left, 0px));
     -webkit-user-select:none; user-select:none;
   }
-  body.is-remote #remoteApp{ display:flex; animation:fadeIn .35s ease; }
+  body.is-remote #remoteApp{ display:flex; }
   body.is-remote #app{ display:none !important; }
-  .rm-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .rm-head{ flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .rm-title{
     font-family:var(--font-display); font-size:1.7rem; letter-spacing:0.04em; line-height:1;
     color:var(--gold);
@@ -611,6 +602,7 @@
     background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:8px 13px;
   }
   .rm-card{
+    flex:0 0 auto;
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px;
     -webkit-user-select:auto; user-select:auto;
   }
@@ -618,43 +610,99 @@
   #rmCodeInput{
     font-family:var(--font-mono); font-size:1.15rem; letter-spacing:0.2em; text-transform:uppercase;
   }
-  .rm-pad{ display:flex; flex-direction:column; gap:12px; flex:1; }
+  .rm-pad{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
   .rm-btn{
-    font-family:var(--font-body); font-weight:800; font-size:1.05rem; letter-spacing:0.01em;
+    flex:0 0 auto; height:56px; height:clamp(46px, 7.6dvh, 72px);
+    display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.15;
+    font-family:var(--font-body); font-weight:800; font-size:1.02rem; letter-spacing:0.01em;
     border-radius:16px; border:1px solid var(--line); background:var(--panel-2); color:var(--paper);
-    padding:18px 14px; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+    padding:0 12px; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
     transition:transform .08s ease, border-color .15s ease, background .15s ease;
   }
   .rm-btn:active{ transform:scale(0.97); }
   .rm-btn.sent{ animation:btnPop .28s ease; }
   .rm-correct{
-    flex:1 1 auto; min-height:32vh; background:var(--teal); border-color:var(--teal); color:#062a33;
-    font-family:var(--font-display); font-size:clamp(2.8rem, 15vw, 4.6rem); letter-spacing:0.04em;
-    border-radius:22px; box-shadow:0 0 0 4px var(--teal-soft);
+    flex:1 1 0; min-height:0; height:auto; background:var(--teal); border-color:var(--teal); color:#062a33;
+    font-family:var(--font-display); font-size:3.4rem; font-size:clamp(2.2rem, min(14vw, 9dvh), 4.6rem);
+    letter-spacing:0.04em; border-radius:22px; box-shadow:0 0 0 4px var(--teal-soft);
   }
   .rm-gold{ background:var(--gold); border-color:var(--gold); color:#211703; }
   .rm-red{ background:var(--red-soft); border-color:var(--red); color:var(--paper); }
-  .rm-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .rm-last{ min-height:1.3em; text-align:center; font-size:0.84rem; font-weight:700; color:var(--teal); }
+  .rm-grid{ flex:0 0 auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .rm-last{ flex:0 0 auto; min-height:1.2em; text-align:center; font-size:0.84rem; font-weight:700; color:var(--teal); }
   .rm-last.bad{ color:var(--red); }
-  .rm-details{
-    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:2px 16px;
+  .rm-sheet{
+    position:absolute; inset:0; z-index:5; display:flex; align-items:flex-end;
+    background:rgba(5,6,10,0.78); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  }
+  .rm-sheet-inner{
+    width:100%; max-height:100%; overflow-y:auto; scrollbar-width:none;
+    background:var(--panel); border:1px solid var(--line); border-radius:20px 20px 0 0;
+    padding:16px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    display:flex; flex-direction:column; gap:12px;
     -webkit-user-select:auto; user-select:auto;
   }
-  .rm-details summary{
-    cursor:pointer; padding:14px 0; font-weight:700; font-size:0.9rem; color:var(--muted); list-style:none;
-  }
-  .rm-details summary::-webkit-details-marker{ display:none; }
-  .rm-details summary::before{ content:'⚙  '; }
-  .rm-details[open] summary{ color:var(--teal); }
-  .rm-host-row{ margin-bottom:16px; }
+  .rm-sheet-inner::-webkit-scrollbar{ display:none; }
+  .rm-sheet-title{ font-family:var(--font-display); font-size:1.5rem; letter-spacing:0.04em; color:var(--gold); line-height:1; }
   .rm-host-row .row{ flex-wrap:nowrap; }
   .rm-host-row input[type=number]{ font-size:1.05rem; text-align:center; }
   .rm-foot{ display:flex; justify-content:center; gap:18px; flex-wrap:wrap; }
+  .rm-foot .rc-linkbtn{ margin-top:0; }
   @media (prefers-reduced-motion: reduce){
-    body.is-remote #remoteApp{ animation:none; }
     .rm-btn.sent{ animation:none; }
     .rc-toast{ transition:none; }
+  }
+
+  /* ================= FIT-TO-SCREEN LAYOUT (no scrollbars) =================
+     The game is laid out at a fixed design width and then scaled by JS so the whole
+     thing always fits the screen: two columns on a landscape screen, one on portrait. */
+  html, body{ overflow:hidden; overscroll-behavior:none; }
+  #fit{
+    position:absolute; left:50%; top:50%;
+    width:1100px; padding:8px 18px;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+  }
+  #fit.port{ width:560px; padding:8px 16px; }
+  #fit .screen{ flex:none; }
+
+  .game-cols, .result-cols{ display:block; }
+  #fit.land .game-cols, #fit.land .result-cols{
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:26px; align-items:start;
+  }
+  #fit.land .leaderboard{ margin:0; }
+  #fit.land .rank-list{ margin-top:10px; }
+  #fit.land .hero{ padding-top:0; }
+  /* portrait: keep the original single-column order (clock, leaderboard, buttons) */
+  #fit.port .game-cols, #fit.port .result-cols{ display:flex; flex-direction:column; }
+  #fit.port .game-left, #fit.port .result-left{ display:contents; }
+  #fit.port .game-left > *{ order:2; }
+  #fit.port .game-left > #stageHeadSolo, #fit.port .game-left > #duelHead{ order:0; }
+  #fit.port .game-right{ order:1; }
+  #fit.port .result-left > .result-banner{ order:0; }
+  #fit.port .result-left > .stats-grid{ order:1; }
+  #fit.port .result-right{ order:2; }
+  #fit.port .result-left > .footer-actions{ order:3; }
+
+  .topbar{ padding:2px 2px 10px; }
+  #screen-setup .card{ max-width:820px; margin-left:auto; margin-right:auto; }
+  #screen-setup .card.wide{ max-width:1020px; }
+  #fit.land .setup-list.two-col{ display:grid; grid-template-columns:1fr 1fr; }
+  .hero h1{ font-size:4rem; }
+  #fit.port .hero h1{ font-size:3.3rem; }
+  .stage-head h2{ font-size:2.4rem; }
+  .duel-name{ font-size:1.5rem; }
+  .duel-clock, .clock-digits{ font-size:3.5rem; }
+  .result-title{ font-size:2.7rem; }
+
+  .duel-side .duel-clock.correct-flash{ animation:correctFlash .4s ease; border-radius:12px; }
+  .modal-overlay{ overflow:hidden; }
+
+  /* "THE FINAL" label belongs inside the duel header, centred over the VS divider */
+  .duel-wrap{ position:relative; }
+  @media (max-height:480px){
+    .rm-sheet-inner{ gap:8px; padding-top:10px; }
+    .rm-sheet-title{ display:none; }
   }
 </style>
 </head>
@@ -666,6 +714,7 @@
 </div>
 <div class="rc-toast" id="rcToast" role="status" aria-live="polite"></div>
 <div id="app">
+<div id="fit" class="fit land">
 
   <div class="topbar">
     <button class="rc-chip hidden" id="rcChip" type="button" aria-label="Remote control status"><span class="rc-dot" id="rcDot"></span><span id="rcChipText">------</span></button>
@@ -700,6 +749,8 @@
       <h1>Dan's BEAT THE&nbsp;CLOCK</h1>
       <p>Last clock ticking wins.</p>
     </div>
+    <div class="game-cols">
+    <div class="game-left">
     <div class="stage-head" id="stageHeadSolo">
       <div class="stage-left">
         <div class="eyebrow">On the clock</div>
@@ -725,7 +776,6 @@
       </div>
     </div>
 
-    <div class="leaderboard" id="leaderboard"></div>
 
     <div class="ctrl-row">
       <button class="btn btn-gold btn-lg" id="startBtn">Start Clock</button>
@@ -766,21 +816,33 @@
     <div class="footer-actions hidden" id="continueRow">
       <button class="btn btn-lg" id="continueBtn">Continue →</button>
     </div>
+    </div>
+    <div class="game-right">
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+    </div>
   </section>
 
   <!-- RESULT -->
   <section class="screen hidden" id="screen-result">
+    <div class="result-cols">
+    <div class="result-left">
     <div class="result-banner" id="resultBanner">
       <div class="result-title" id="resultTitle">—</div>
       <div class="result-sub" id="resultSub">—</div>
     </div>
     <div class="stats-grid" id="statsGrid"></div>
-    <div class="rank-list" id="rankList"></div>
     <div class="footer-actions">
       <button class="btn btn-lg" id="newGameBtn">New Game</button>
     </div>
+    </div>
+    <div class="result-right">
+      <div class="rank-list" id="rankList"></div>
+    </div>
+    </div>
   </section>
 
+</div>
 </div>
 
 
@@ -798,6 +860,7 @@
       <button class="btn btn-teal" id="rmCodeBtn" type="button">Connect</button>
     </div>
     <p class="rm-help">On the screen that shows the game, tap the 📡 button, then scan the QR code with this phone — or type the code shown there.</p>
+    <button type="button" class="rc-linkbtn" id="rmShowGame2">Show the game on this device instead</button>
   </div>
 
   <div class="rm-pad hidden" id="rmPad">
@@ -808,10 +871,15 @@
       <button type="button" class="rm-btn" data-rm="pause">Pause / Resume</button>
     </div>
     <button type="button" class="rm-btn rm-red" data-rm="continue">Continue →</button>
-    <button type="button" class="rm-btn" data-rm="start-game">Start game</button>
+    <div class="rm-grid">
+      <button type="button" class="rm-btn" data-rm="start-game">Start game</button>
+      <button type="button" class="rm-btn" id="rmMoreBtn">⚙ Host controls</button>
+    </div>
+  </div>
 
-    <details class="rm-details" id="rmHost">
-      <summary>Host controls</summary>
+  <div class="rm-sheet hidden" id="rmSheet">
+    <div class="rm-sheet-inner">
+      <div class="rm-sheet-title">Host controls</div>
       <div class="rm-host-row">
         <label class="field-label" for="rmBonus">Add time to remaining players (seconds)</label>
         <div class="row">
@@ -826,14 +894,14 @@
           <button type="button" class="btn btn-teal" id="rmSetBtn">Set</button>
         </div>
       </div>
-    </details>
-
-    <button type="button" class="rm-btn" id="rmNewGame">New game</button>
-  </div>
-
-  <div class="rm-foot">
-    <button type="button" class="rc-linkbtn" id="rmChange">Change code</button>
-    <button type="button" class="rc-linkbtn" id="rmShowGame">Show the game on this device instead</button>
+      <div class="rm-last" id="rmSheetLast" aria-live="polite"></div>
+      <button type="button" class="rm-btn" id="rmNewGame">New game</button>
+      <div class="rm-foot">
+        <button type="button" class="rc-linkbtn" id="rmChange">Change code</button>
+        <button type="button" class="rc-linkbtn" id="rmShowGame">Show the game on this device instead</button>
+      </div>
+      <button type="button" class="rm-btn rm-gold" id="rmSheetClose">Close</button>
+    </div>
   </div>
 </main>
 
@@ -1034,6 +1102,8 @@
   function sparkBurst(originEl){
     if(prefersReducedMotion() || !originEl) return;
     var rect = originEl.getBoundingClientRect();
+    if(!rect.width && !rect.height) return; // hidden element: nothing sensible to burst from
+    var k = fitScale || 1;
     var layer = document.createElement('div');
     layer.style.cssText = 'position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:9997;';
     document.body.appendChild(layer);
@@ -1042,9 +1112,9 @@
     for(var i=0; i<16; i++){
       var s = document.createElement('div');
       var angle = Math.random() * Math.PI * 2;
-      var dist = 36 + Math.random()*54;
+      var dist = (36 + Math.random()*54) * k;
       var dx = Math.cos(angle)*dist, dy = Math.sin(angle)*dist;
-      var size = 4 + Math.random()*4;
+      var size = (4 + Math.random()*4) * k;
       s.style.cssText = 'position:absolute; left:'+cx+'px; top:'+cy+'px; width:'+size+'px; height:'+size+'px; border-radius:50%; background:'+colors[i%2]+'; animation:sparkOut .55s ease-out forwards;';
       s.style.setProperty('--sx', dx + 'px');
       s.style.setProperty('--sy', dy + 'px');
@@ -1165,6 +1235,8 @@
     var n = state.setupPlayers.length;
     $('#countNote').textContent = n + ' player' + (n===1?'':'s') + ' added';
     $('#startGameBtn').disabled = n < 2;
+    list.classList.toggle('two-col', n > 5);
+    $('#screen-setup .card').classList.toggle('wide', n > 5);
   }
 
   function addPlayerFromInput(){
@@ -1444,10 +1516,19 @@
       }
     }
 
+    // Normally the burst comes from the big clock. In the final (two players) that clock is
+    // hidden, so burst from the clock of the player who just answered.
+    var burstEl = $('#clockWrap');
+    if(!$('#duelHead').classList.contains('hidden')){
+      var duelPair = getDuelPair() || state.finalDuelPair;
+      var di = duelPair ? duelPair.indexOf(state.activeIndex) : -1;
+      if(di === 0) burstEl = $('#duelClockA');
+      else if(di === 1) burstEl = $('#duelClockB');
+    }
     dingCorrect();
-    flashEl($('#clockWrap'), 'correct-flash');
+    flashEl(burstEl, 'correct-flash');
     flashEl($('#correctBtn'), 'pop');
-    sparkBurst($('#clockWrap'));
+    sparkBurst(burstEl);
     var nxt = nextAvailableIndex(state.activeIndex);
     if(nxt !== -1) state.activeIndex = nxt;
     state.turnStartAt = nowMs; // next player's turn timing starts now
@@ -1809,6 +1890,47 @@
     }
   }, 100);
 
+  /* ================= FIT TO SCREEN =================
+     The whole game sits in #fit, laid out at a fixed design width (1100px landscape /
+     560px portrait) and then scaled up or down so it always fits the window exactly.
+     That is why there are never any scrollbars. */
+  var fitScale = 1;
+  function fitApp(){
+    var fit = $('#fit');
+    if(!fit || document.body.classList.contains('is-remote')) return;
+    var vw = document.documentElement.clientWidth || window.innerWidth;
+    var vh = window.innerHeight;
+    var land = (vw / vh) >= 1.15;
+    if(fit._land !== land){
+      fit._land = land;
+      fit.classList.toggle('land', land);
+      fit.classList.toggle('port', !land);
+    }
+    var w = fit.offsetWidth, h = fit.offsetHeight;
+    if(!w || !h) return;
+    var s = Math.min((vw - 12) / w, (vh - 12) / h);
+    s = Math.max(0.15, Math.min(s, 2.6));
+    if(Math.abs(s - fitScale) > 0.002 || !fit._placed){
+      fitScale = s;
+      fit._placed = true;
+      fit.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+    }
+  }
+  var fitQueued = false;
+  function scheduleFit(){
+    if(fitQueued) return;
+    fitQueued = true;
+    window.requestAnimationFrame(function(){ fitQueued = false; fitApp(); });
+  }
+  function initFit(){
+    fitApp();
+    window.addEventListener('resize', scheduleFit);
+    window.addEventListener('orientationchange', scheduleFit);
+    if(window.ResizeObserver){ new ResizeObserver(scheduleFit).observe($('#fit')); }
+    else { setInterval(fitApp, 400); }
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(scheduleFit); }
+  }
+
   /* ================= REMOTE CONTROL (one-way) =================
      One device shows the game (the "display"). A second device ("remote") sends button
      presses to it. Messages travel through free public MQTT relays over secure
@@ -2118,7 +2240,16 @@
     }
     updateRcUi();
     $('#remoteModal').classList.remove('hidden');
+    fitRemoteModal();
   }
+  function fitRemoteModal(){
+    var box = document.querySelector('#remoteModal .modal-box');
+    if(!box || $('#remoteModal').classList.contains('hidden')) return;
+    box.style.transform = '';
+    var h = box.offsetHeight, avail = window.innerHeight - 24;
+    if(h > avail && avail > 100) box.style.transform = 'scale(' + (avail / h) + ')';
+  }
+  window.addEventListener('resize', fitRemoteModal);
   function closeRemoteModal(){ $('#remoteModal').classList.add('hidden'); }
 
   function enableRemote(){
@@ -2197,8 +2328,8 @@
 
   function showPair(prefill){
     $('#rmPad').classList.add('hidden');
+    $('#rmSheet').classList.add('hidden');
     $('#rmPair').classList.remove('hidden');
-    $('#rmChange').classList.add('hidden');
     $('#rmCodeInput').value = prefill || '';
     if(rmLink){ rmLink.stop(false); rmLink = null; }
     releaseWake();
@@ -2211,7 +2342,6 @@
     try{ window.history.replaceState(null, '', remoteUrl(code)); }catch(e){}
     $('#rmPair').classList.add('hidden');
     $('#rmPad').classList.remove('hidden');
-    $('#rmChange').classList.remove('hidden');
     if(rmLink) rmLink.stop(false);
     rmStartAt = Date.now(); rmLinkError = false;
     rmLink = createLink('remote', code, {
@@ -2226,18 +2356,16 @@
     var now = Date.now();
     if(rmLastAt[cmd] && now - rmLastAt[cmd] < 500) return; // ignore accidental double taps
     rmLastAt[cmd] = now;
-    var last = $('#rmLast');
+    var lasts = [$('#rmLast'), $('#rmSheetLast')];
     var msg = { v:1, s:rmSession, n:++rmSeq, cmd:cmd };
     if(arg !== undefined) msg.arg = arg;
     var sent = rmLink ? rmLink.publish(msg) : 0;
     if(btn){ btn.classList.remove('sent'); void btn.offsetWidth; btn.classList.add('sent'); }
     if(sent > 0){
-      last.textContent = 'Sent: ' + label + ' ✓';
-      last.classList.remove('bad');
+      lasts.forEach(function(l){ l.textContent = 'Sent: ' + label + ' ✓'; l.classList.remove('bad'); });
       try{ if(navigator.vibrate) navigator.vibrate(15); }catch(e){}
     } else {
-      last.textContent = 'Not connected, so that was not sent';
-      last.classList.add('bad');
+      lasts.forEach(function(l){ l.textContent = 'Not connected, so that was not sent'; l.classList.add('bad'); });
       try{ if(navigator.vibrate) navigator.vibrate([40, 40, 40]); }catch(e){}
     }
   }
@@ -2270,6 +2398,7 @@
         clearTimeout(rmNewGameArmed); rmNewGameArmed = null;
         btn.textContent = 'New game';
         sendCmd('new-game', undefined, 'new game', btn);
+        $('#rmSheet').classList.add('hidden');
       } else {
         btn.textContent = 'Tap again to confirm';
         rmNewGameArmed = setTimeout(function(){ rmNewGameArmed = null; btn.textContent = 'New game'; }, 3000);
@@ -2284,7 +2413,12 @@
     on($('#rmCodeBtn'), 'click', submitCode);
     on($('#rmCodeInput'), 'keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); submitCode(); } });
     on($('#rmChange'), 'click', function(){ showPair(rmCode); });
-    on($('#rmShowGame'), 'click', function(){ window.location.href = window.location.pathname; });
+    function goGame(){ window.location.href = window.location.pathname; }
+    on($('#rmShowGame'), 'click', goGame);
+    on($('#rmShowGame2'), 'click', goGame);
+    on($('#rmMoreBtn'), 'click', function(){ $('#rmSheet').classList.remove('hidden'); });
+    on($('#rmSheetClose'), 'click', function(){ $('#rmSheet').classList.add('hidden'); });
+    on($('#rmSheet'), 'click', function(e){ if(e.target.id === 'rmSheet') $('#rmSheet').classList.add('hidden'); });
     document.addEventListener('pointerdown', requestWake, { passive:true });
 
     var code = normCode(qs.get('remote'));
@@ -2307,6 +2441,7 @@
   seedDefaultPlayers();
   renderSetup();
   goScreen('setup');
+  initFit();
   initRemoteFeature();
 
 })();
