@@ -704,6 +704,45 @@
     .rm-sheet-inner{ gap:8px; padding-top:10px; }
     .rm-sheet-title{ display:none; }
   }
+
+  /* ---------- remote: players editor ---------- */
+  .rm-grid.three{ grid-template-columns:repeat(3, 1fr); }
+  .rm-grid.three .rm-btn{ font-size:0.9rem; padding:0 6px; }
+  .rm-sheet.full .rm-sheet-inner{ height:calc(100% - 18px); overflow:hidden; gap:10px; }
+  .rm-phead{ flex:0 0 auto; display:flex; align-items:center; gap:8px; }
+  .rm-phead .rm-sheet-title{ flex:1; }
+  .rm-phead .rc-linkbtn{ margin:0; padding:8px; }
+  .rm-x{
+    flex:0 0 40px; width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); font-size:1rem; cursor:pointer;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  }
+  .rm-plist{
+    flex:1 1 0; min-height:0; overflow-y:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .rm-plist::-webkit-scrollbar{ display:none; }
+  .rm-pempty{ color:var(--muted); font-size:0.88rem; text-align:center; padding:18px 8px; }
+  .rm-prow{
+    flex:0 0 auto; display:flex; align-items:center; gap:6px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:6px;
+  }
+  .rm-prow input, .rm-padd input{ width:auto; min-width:0; font-size:16px; padding:9px 10px; }
+  .rm-prow .rm-pname, .rm-padd .rm-pname{ flex:1 1 0; }
+  .rm-prow .rm-ptime, .rm-padd .rm-ptime{ flex:0 0 64px; text-align:center; padding:9px 4px; }
+  .rm-ibtn{
+    flex:0 0 34px; height:38px; padding:0; border-radius:9px; border:1px solid var(--line);
+    background:var(--panel); color:var(--paper); font-size:0.95rem; cursor:pointer;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  }
+  .rm-ibtn:disabled{ opacity:0.25; }
+  .rm-ibtn.remove:active{ color:var(--red); border-color:var(--red); }
+  .rm-padd{ flex:0 0 auto; display:flex; gap:6px; align-items:stretch; }
+  .rm-padd .btn{ flex:0 0 auto; padding:0 16px; }
+  .rm-pmsg{ flex:0 0 auto; min-height:1.2em; font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.3; }
+  .rm-pmsg.ok{ color:var(--teal); }
+  .rm-pmsg.bad{ color:var(--red); }
+  @media (max-height:480px){ .rm-phead .rm-sheet-title{ display:none; } .rm-sheet.full .rm-sheet-inner{ height:calc(100% - 6px); } }
 </style>
 </head>
 <body>
@@ -871,9 +910,10 @@
       <button type="button" class="rm-btn" data-rm="pause">Pause / Resume</button>
     </div>
     <button type="button" class="rm-btn rm-red" data-rm="continue">Continue →</button>
-    <div class="rm-grid">
+    <div class="rm-grid three">
       <button type="button" class="rm-btn" data-rm="start-game">Start game</button>
-      <button type="button" class="rm-btn" id="rmMoreBtn">⚙ Host controls</button>
+      <button type="button" class="rm-btn" id="rmPlayersBtn">👥 Players</button>
+      <button type="button" class="rm-btn" id="rmMoreBtn">⚙ Host</button>
     </div>
   </div>
 
@@ -901,6 +941,25 @@
         <button type="button" class="rc-linkbtn" id="rmShowGame">Show the game on this device instead</button>
       </div>
       <button type="button" class="rm-btn rm-gold" id="rmSheetClose">Close</button>
+    </div>
+  </div>
+
+  <div class="rm-sheet full hidden" id="rmPlayersSheet">
+    <div class="rm-sheet-inner">
+      <div class="rm-phead">
+        <div class="rm-sheet-title">Players</div>
+        <button type="button" class="rc-linkbtn" id="rmSortBtn">Sort by time</button>
+        <button type="button" class="rm-x" id="rmPlayersClose" aria-label="Close players">✕</button>
+      </div>
+      <div class="rm-plist" id="rmPlist"></div>
+      <div class="rm-padd">
+        <input type="text" class="rm-pname" id="rmAddName" maxlength="20" placeholder="New player" autocomplete="off" autocorrect="off" enterkeyhint="done" aria-label="New player name">
+        <input type="number" class="rm-ptime" id="rmAddTime" value="60" min="1" max="1800" step="1" inputmode="numeric" aria-label="Time in seconds">
+        <button type="button" class="btn btn-teal" id="rmAddBtn">Add</button>
+      </div>
+      <div class="rm-pmsg" id="rmPmsg" aria-live="polite">Names and seconds per player. Applies while the display is on its setup screen.</div>
+      <button type="button" class="rm-btn rm-gold" id="rmSendPlayers">Send to display</button>
+      <button type="button" class="rm-btn" id="rmSendStart">Send &amp; start game</button>
     </div>
   </div>
 </main>
@@ -1943,6 +2002,7 @@
     'wss://test.mosquitto.org:8081'
   ];
   var TOPIC_ROOT = 'dansbtc/1/';
+  var MAX_PLAYERS = 24;
   var CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I, O, 0, 1
   var qs = new URLSearchParams(window.location.search);
   var IS_REMOTE = qs.has('remote');
@@ -2126,7 +2186,7 @@
 
   var CMD_LABEL = {
     'start-game':'Start game', 'start-clock':'Start clock', 'correct':'Correct ✓', 'pause':'Pause / Resume',
-    'continue':'Continue', 'bonus':'Add time', 'set-time':'Set clocks', 'new-game':'New game'
+    'continue':'Continue', 'bonus':'Add time', 'set-time':'Set clocks', 'new-game':'New game', 'set-players':'Set players'
   };
 
   function runRemoteCommand(cmd, arg){
@@ -2172,6 +2232,25 @@
           done = true;
         }
         break;
+      case 'set-players':
+        // Replaces the player list on the setup screen. Everything is sanitised: this text comes over a public channel.
+        if(state.screen === 'setup' && Array.isArray(arg)){
+          var list = [];
+          for(var pi = 0; pi < arg.length && list.length < MAX_PLAYERS; pi++){
+            var it = arg[pi];
+            if(!it || typeof it.name !== 'string') continue;
+            var nm = it.name.replace(/\s+/g, ' ').trim().slice(0, 20);
+            if(!nm) continue;
+            var tm = Math.round(Number(it.time));
+            if(!isFinite(tm)) tm = 60;
+            list.push({ id:newId(), name:nm, time:Math.max(1, Math.min(1800, tm)) });
+          }
+          state.setupPlayers = list;
+          renderSetup();
+          label = 'Players set (' + list.length + ')';
+          done = true;
+        }
+        break;
       case 'new-game':
         if((onGame || state.screen === 'result') && !state.countdownActive){ $('#confirmYesBtn').click(); done = true; }
         break;
@@ -2181,6 +2260,7 @@
 
   function handleIncoming(text){
     var m;
+    if(typeof text !== 'string' || text.length > 12000) return;
     try{ m = JSON.parse(text); }catch(e){ return; }
     if(!m || m.v !== 1 || typeof m.cmd !== 'string' || typeof m.s !== 'string' || m.s.length > 16 || typeof m.n !== 'number') return;
     var id = m.s + ':' + m.n;
@@ -2329,6 +2409,7 @@
   function showPair(prefill){
     $('#rmPad').classList.add('hidden');
     $('#rmSheet').classList.add('hidden');
+    $('#rmPlayersSheet').classList.add('hidden');
     $('#rmPair').classList.remove('hidden');
     $('#rmCodeInput').value = prefill || '';
     if(rmLink){ rmLink.stop(false); rmLink = null; }
@@ -2354,7 +2435,7 @@
 
   function sendCmd(cmd, arg, label, btn){
     var now = Date.now();
-    if(rmLastAt[cmd] && now - rmLastAt[cmd] < 500) return; // ignore accidental double taps
+    if(rmLastAt[cmd] && now - rmLastAt[cmd] < 500) return -1; // ignore accidental double taps
     rmLastAt[cmd] = now;
     var lasts = [$('#rmLast'), $('#rmSheetLast')];
     var msg = { v:1, s:rmSession, n:++rmSeq, cmd:cmd };
@@ -2367,6 +2448,128 @@
     } else {
       lasts.forEach(function(l){ l.textContent = 'Not connected, so that was not sent'; l.classList.add('bad'); });
       try{ if(navigator.vibrate) navigator.vibrate([40, 40, 40]); }catch(e){}
+    }
+    return sent;
+  }
+
+
+  /* ---- players editor (phone) ---- */
+  function clampTime(v){
+    v = Math.round(Number(v));
+    if(!isFinite(v)) v = 60;
+    return Math.max(1, Math.min(1800, v));
+  }
+  function loadPlayers(){
+    try{
+      var a = JSON.parse(store.get('btc_remote_players') || 'null');
+      if(Array.isArray(a)){
+        return a.slice(0, MAX_PLAYERS).map(function(p){
+          return { name:String((p && p.name) || '').slice(0, 20), time:clampTime(p && p.time) };
+        });
+      }
+    }catch(e){}
+    return [1,2,3,4].map(function(i){ return { name:'Player ' + i, time:60 }; });
+  }
+  var rmPlayers = loadPlayers();
+  function savePlayers(){ store.set('btc_remote_players', JSON.stringify(rmPlayers)); }
+  function setPmsg(text, cls){
+    var m = $('#rmPmsg');
+    m.textContent = text;
+    m.className = 'rm-pmsg' + (cls ? ' ' + cls : '');
+  }
+  function renderPlayers(keepScroll){
+    var list = $('#rmPlist');
+    var top = list.scrollTop;
+    list.innerHTML = '';
+    if(!rmPlayers.length){
+      var empty = document.createElement('div');
+      empty.className = 'rm-pempty';
+      empty.textContent = 'No players yet. Add at least two below.';
+      list.appendChild(empty);
+    }
+    rmPlayers.forEach(function(p, idx){
+      var row = document.createElement('div');
+      row.className = 'rm-prow';
+
+      var nameIn = document.createElement('input');
+      nameIn.type = 'text'; nameIn.className = 'rm-pname'; nameIn.maxLength = 20; nameIn.value = p.name;
+      nameIn.setAttribute('aria-label', 'Player ' + (idx + 1) + ' name');
+      nameIn.setAttribute('autocomplete', 'off');
+      on(nameIn, 'input', function(){ p.name = nameIn.value; savePlayers(); });
+
+      var timeIn = document.createElement('input');
+      timeIn.type = 'number'; timeIn.className = 'rm-ptime'; timeIn.value = p.time; timeIn.min = 1; timeIn.max = 1800; timeIn.step = 1;
+      timeIn.setAttribute('inputmode', 'numeric');
+      timeIn.setAttribute('aria-label', 'Player ' + (idx + 1) + ' seconds');
+      on(timeIn, 'input', function(){
+        var v = Math.round(parseFloat(timeIn.value));
+        if(!isNaN(v) && v >= 1){ p.time = Math.min(1800, v); savePlayers(); }
+      });
+      on(timeIn, 'blur', function(){ timeIn.value = p.time; });
+
+      function mk(label, text, aria, fn, disabled, extra){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'rm-ibtn' + (extra ? ' ' + extra : ''); b.textContent = text;
+        b.setAttribute('aria-label', aria); b.disabled = !!disabled;
+        on(b, 'click', fn);
+        return b;
+      }
+      var up = mk('up', '↑', 'Move up', function(){
+        var t = rmPlayers[idx - 1]; rmPlayers[idx - 1] = rmPlayers[idx]; rmPlayers[idx] = t;
+        savePlayers(); renderPlayers(true);
+      }, idx === 0);
+      var down = mk('down', '↓', 'Move down', function(){
+        var t = rmPlayers[idx + 1]; rmPlayers[idx + 1] = rmPlayers[idx]; rmPlayers[idx] = t;
+        savePlayers(); renderPlayers(true);
+      }, idx === rmPlayers.length - 1);
+      var del = mk('remove', '×', 'Remove player', function(){
+        rmPlayers.splice(idx, 1);
+        savePlayers(); renderPlayers(true);
+      }, false, 'remove');
+
+      row.appendChild(nameIn); row.appendChild(timeIn);
+      row.appendChild(up); row.appendChild(down); row.appendChild(del);
+      list.appendChild(row);
+    });
+    if(keepScroll) list.scrollTop = top;
+  }
+  function cleanPlayers(){
+    var out = [];
+    rmPlayers.forEach(function(p){
+      var name = String(p.name || '').replace(/\s+/g, ' ').trim().slice(0, 20);
+      if(name) out.push({ name:name, time:clampTime(p.time) });
+    });
+    return out;
+  }
+  function addPlayer(){
+    var nameIn = $('#rmAddName'), timeIn = $('#rmAddTime');
+    var name = nameIn.value.replace(/\s+/g, ' ').trim();
+    if(!name){ nameIn.focus(); return; }
+    if(rmPlayers.length >= MAX_PLAYERS){ setPmsg('That is the maximum of ' + MAX_PLAYERS + ' players.', 'bad'); return; }
+    var t = clampTime(timeIn.value);
+    store.set('btc_remote_time', String(t));
+    rmPlayers.push({ name:name.slice(0, 20), time:t });
+    nameIn.value = '';
+    savePlayers();
+    renderPlayers(false);
+    var list = $('#rmPlist'); list.scrollTop = list.scrollHeight;
+    setPmsg('Added ' + name.slice(0, 20) + '. Tap Send to display when you are ready.');
+    nameIn.focus();
+  }
+  function sendPlayers(andStart){
+    var list = cleanPlayers();
+    if(list.length < 2){ setPmsg('Add at least 2 players with names first.', 'bad'); return; }
+    var sent = sendCmd('set-players', list, 'players (' + list.length + ')', $(andStart ? '#rmSendStart' : '#rmSendPlayers'));
+    if(sent === -1) return;
+    if(sent === 0){ setPmsg('Not connected, so that was not sent.', 'bad'); return; }
+    if(andStart){
+      setPmsg('Sent ' + list.length + ' players ✓ starting the game…', 'ok');
+      setTimeout(function(){
+        sendCmd('start-game', undefined, 'start game', null);
+        $('#rmPlayersSheet').classList.add('hidden'); // back to the buttons, ready for Start clock
+      }, 450);
+    } else {
+      setPmsg('Sent ' + list.length + ' players ✓ They appear on the display’s setup screen.', 'ok');
     }
   }
 
@@ -2417,6 +2620,22 @@
     on($('#rmShowGame'), 'click', goGame);
     on($('#rmShowGame2'), 'click', goGame);
     on($('#rmMoreBtn'), 'click', function(){ $('#rmSheet').classList.remove('hidden'); });
+    $('#rmAddTime').value = String(clampTime(store.get('btc_remote_time') || 60));
+    on($('#rmPlayersBtn'), 'click', function(){
+      renderPlayers(false);
+      $('#rmPlayersSheet').classList.remove('hidden');
+    });
+    on($('#rmPlayersClose'), 'click', function(){ $('#rmPlayersSheet').classList.add('hidden'); });
+    on($('#rmPlayersSheet'), 'click', function(e){ if(e.target.id === 'rmPlayersSheet') $('#rmPlayersSheet').classList.add('hidden'); });
+    on($('#rmSortBtn'), 'click', function(){
+      rmPlayers.sort(function(a, b){ return clampTime(b.time) - clampTime(a.time); });
+      savePlayers(); renderPlayers(false);
+      setPmsg('Sorted by time, most first.');
+    });
+    on($('#rmAddBtn'), 'click', addPlayer);
+    on($('#rmAddName'), 'keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); addPlayer(); } });
+    on($('#rmSendPlayers'), 'click', function(){ sendPlayers(false); });
+    on($('#rmSendStart'), 'click', function(){ sendPlayers(true); });
     on($('#rmSheetClose'), 'click', function(){ $('#rmSheet').classList.add('hidden'); });
     on($('#rmSheet'), 'click', function(e){ if(e.target.id === 'rmSheet') $('#rmSheet').classList.add('hidden'); });
     document.addEventListener('pointerdown', requestWake, { passive:true });
