@@ -1,8 +1,13 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beat the Clock">
+<meta name="theme-color" content="#0b0d14">
 <title>Dan's Beat the Clock</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -43,7 +48,7 @@
   #app{
     max-width:900px;
     margin:0 auto;
-    padding:20px 20px 60px;
+    padding:calc(20px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) calc(60px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
     min-height:100vh;
     display:flex;
     flex-direction:column;
@@ -527,6 +532,130 @@
   .modal-sub{color:var(--muted); font-size:0.88rem; margin:8px 0 20px;}
   .modal-actions{display:flex; gap:10px; justify-content:center;}
   .modal-actions .btn{flex:1;}
+
+  /* ================= REMOTE CONTROL ================= */
+  .topbar{ gap:10px; }
+  .rc-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--panel); border:1px solid var(--line); color:var(--paper);
+    border-radius:999px; padding:0 14px; height:38px; cursor:pointer;
+    font-family:var(--font-mono); font-size:0.78rem; font-weight:600; letter-spacing:0.1em;
+    touch-action:manipulation;
+    transition:border-color .15s ease;
+  }
+  .rc-chip:hover{ border-color:rgba(255,255,255,0.25); }
+  .rc-dot, .rm-dot{
+    width:9px; height:9px; border-radius:50%; background:var(--muted); flex:0 0 auto;
+  }
+  .rc-dot.ok, .rm-status.ok .rm-dot{ background:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); }
+  .rc-dot.warn, .rm-status.warn .rm-dot{ background:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+  .rc-dot.bad, .rm-status.bad .rm-dot{ background:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
+
+  .rc-toast{
+    position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top, 0px));
+    transform:translate(-50%,-14px); opacity:0; pointer-events:none; z-index:10002;
+    background:var(--panel-2); border:1px solid var(--teal); color:var(--paper);
+    padding:10px 18px; border-radius:999px; font-weight:700; font-size:0.9rem;
+    box-shadow:var(--shadow); white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis;
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .rc-toast.show{ opacity:1; transform:translate(-50%,0); }
+  .rc-toast.dim{ border-color:var(--line); color:var(--muted); }
+
+  .remote-box{ max-width:400px; }
+  .rc-qr{
+    width:196px; height:196px; margin:4px auto 14px; border-radius:12px; overflow:hidden;
+    background:#fff; padding:0;
+  }
+  .rc-qr svg{ display:block; width:100%; height:100%; }
+  .rc-code{
+    font-family:var(--font-mono); font-weight:700; font-size:2rem; letter-spacing:0.28em;
+    color:var(--gold); padding-left:0.28em; user-select:all; -webkit-user-select:all;
+  }
+  .rc-link{
+    font-family:var(--font-mono); font-size:0.7rem; color:var(--muted);
+    word-break:break-all; margin:8px 0 12px; user-select:all; -webkit-user-select:all;
+  }
+  .rc-status{ font-size:0.82rem; font-weight:600; color:var(--muted); margin-bottom:12px; }
+  .rc-status.ok{ color:var(--teal); }
+  .rc-status.bad{ color:var(--red); }
+  .rc-note{
+    font-size:0.8rem; color:var(--gold); background:var(--gold-soft);
+    border:1px solid rgba(231,183,64,0.35); border-radius:10px; padding:9px 12px; margin-bottom:12px;
+  }
+  .rc-linkbtn{
+    background:none; border:none; color:var(--muted); font-family:var(--font-body);
+    font-size:0.78rem; font-weight:600; cursor:pointer; text-decoration:underline;
+    margin-top:14px; padding:6px;
+  }
+  .rc-linkbtn:hover{ color:var(--paper); }
+
+  /* ---------- remote (phone) screen ---------- */
+  #remoteApp{
+    display:none; flex-direction:column; gap:12px;
+    max-width:560px; margin:0 auto;
+    min-height:100vh; min-height:100dvh;
+    padding:calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px))
+            calc(22px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px));
+    -webkit-user-select:none; user-select:none;
+  }
+  body.is-remote #remoteApp{ display:flex; animation:fadeIn .35s ease; }
+  body.is-remote #app{ display:none !important; }
+  .rm-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .rm-title{
+    font-family:var(--font-display); font-size:1.7rem; letter-spacing:0.04em; line-height:1;
+    color:var(--gold);
+  }
+  .rm-status{
+    display:flex; align-items:center; gap:8px; font-size:0.76rem; font-weight:700; color:var(--muted);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:8px 13px;
+  }
+  .rm-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px;
+    -webkit-user-select:auto; user-select:auto;
+  }
+  .rm-help{ font-size:0.82rem; color:var(--muted); margin:12px 0 0; line-height:1.45; }
+  #rmCodeInput{
+    font-family:var(--font-mono); font-size:1.15rem; letter-spacing:0.2em; text-transform:uppercase;
+  }
+  .rm-pad{ display:flex; flex-direction:column; gap:12px; flex:1; }
+  .rm-btn{
+    font-family:var(--font-body); font-weight:800; font-size:1.05rem; letter-spacing:0.01em;
+    border-radius:16px; border:1px solid var(--line); background:var(--panel-2); color:var(--paper);
+    padding:18px 14px; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+    transition:transform .08s ease, border-color .15s ease, background .15s ease;
+  }
+  .rm-btn:active{ transform:scale(0.97); }
+  .rm-btn.sent{ animation:btnPop .28s ease; }
+  .rm-correct{
+    flex:1 1 auto; min-height:32vh; background:var(--teal); border-color:var(--teal); color:#062a33;
+    font-family:var(--font-display); font-size:clamp(2.8rem, 15vw, 4.6rem); letter-spacing:0.04em;
+    border-radius:22px; box-shadow:0 0 0 4px var(--teal-soft);
+  }
+  .rm-gold{ background:var(--gold); border-color:var(--gold); color:#211703; }
+  .rm-red{ background:var(--red-soft); border-color:var(--red); color:var(--paper); }
+  .rm-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .rm-last{ min-height:1.3em; text-align:center; font-size:0.84rem; font-weight:700; color:var(--teal); }
+  .rm-last.bad{ color:var(--red); }
+  .rm-details{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:2px 16px;
+    -webkit-user-select:auto; user-select:auto;
+  }
+  .rm-details summary{
+    cursor:pointer; padding:14px 0; font-weight:700; font-size:0.9rem; color:var(--muted); list-style:none;
+  }
+  .rm-details summary::-webkit-details-marker{ display:none; }
+  .rm-details summary::before{ content:'⚙  '; }
+  .rm-details[open] summary{ color:var(--teal); }
+  .rm-host-row{ margin-bottom:16px; }
+  .rm-host-row .row{ flex-wrap:nowrap; }
+  .rm-host-row input[type=number]{ font-size:1.05rem; text-align:center; }
+  .rm-foot{ display:flex; justify-content:center; gap:18px; flex-wrap:wrap; }
+  @media (prefers-reduced-motion: reduce){
+    body.is-remote #remoteApp{ animation:none; }
+    .rm-btn.sent{ animation:none; }
+    .rc-toast{ transition:none; }
+  }
 </style>
 </head>
 <body>
@@ -535,9 +664,12 @@
 <div class="countdown-overlay hidden" id="countdownOverlay">
   <div class="countdown-num" id="countdownNum">3</div>
 </div>
+<div class="rc-toast" id="rcToast" role="status" aria-live="polite"></div>
 <div id="app">
 
   <div class="topbar">
+    <button class="rc-chip hidden" id="rcChip" type="button" aria-label="Remote control status"><span class="rc-dot" id="rcDot"></span><span id="rcChipText">------</span></button>
+    <button class="icon-btn" id="remoteBtn" type="button" aria-label="Remote control" title="Remote control">📡</button>
     <button class="icon-btn" id="muteBtn" aria-label="Toggle sound" title="Toggle sound">🔊</button>
   </div>
 
@@ -651,6 +783,82 @@
 
 </div>
 
+
+<!-- REMOTE (phone) SCREEN — only shown when the page is opened with ?remote=CODE -->
+<main id="remoteApp" aria-label="Remote control">
+  <div class="rm-head">
+    <div class="rm-title">Remote</div>
+    <div class="rm-status warn" id="rmStatus" role="status" aria-live="polite"><span class="rm-dot"></span><span id="rmStatusText">Connecting…</span></div>
+  </div>
+
+  <div class="rm-card hidden" id="rmPair">
+    <label class="field-label" for="rmCodeInput">Room code</label>
+    <div class="row">
+      <input type="text" id="rmCodeInput" maxlength="12" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="A7K2QX">
+      <button class="btn btn-teal" id="rmCodeBtn" type="button">Connect</button>
+    </div>
+    <p class="rm-help">On the screen that shows the game, tap the 📡 button, then scan the QR code with this phone — or type the code shown there.</p>
+  </div>
+
+  <div class="rm-pad hidden" id="rmPad">
+    <button type="button" class="rm-btn rm-correct" data-rm="correct" aria-label="Correct answer">✓ CORRECT</button>
+    <div class="rm-last" id="rmLast" aria-live="polite"></div>
+    <div class="rm-grid">
+      <button type="button" class="rm-btn rm-gold" data-rm="start-clock">▶ Start clock</button>
+      <button type="button" class="rm-btn" data-rm="pause">Pause / Resume</button>
+    </div>
+    <button type="button" class="rm-btn rm-red" data-rm="continue">Continue →</button>
+    <button type="button" class="rm-btn" data-rm="start-game">Start game</button>
+
+    <details class="rm-details" id="rmHost">
+      <summary>Host controls</summary>
+      <div class="rm-host-row">
+        <label class="field-label" for="rmBonus">Add time to remaining players (seconds)</label>
+        <div class="row">
+          <input type="number" id="rmBonus" value="10" step="1" inputmode="numeric" aria-label="Seconds to add (negative removes)">
+          <button type="button" class="btn btn-teal" id="rmBonusBtn">Apply</button>
+        </div>
+      </div>
+      <div class="rm-host-row">
+        <label class="field-label" for="rmSet">Set all clocks to (seconds)</label>
+        <div class="row">
+          <input type="number" id="rmSet" value="60" min="1" step="1" inputmode="numeric" aria-label="Seconds to set all clocks to">
+          <button type="button" class="btn btn-teal" id="rmSetBtn">Set</button>
+        </div>
+      </div>
+    </details>
+
+    <button type="button" class="rm-btn" id="rmNewGame">New game</button>
+  </div>
+
+  <div class="rm-foot">
+    <button type="button" class="rc-linkbtn" id="rmChange">Change code</button>
+    <button type="button" class="rc-linkbtn" id="rmShowGame">Show the game on this device instead</button>
+  </div>
+</main>
+
+<!-- Display-side pairing dialog -->
+<div class="modal-overlay hidden" id="remoteModal">
+  <div class="modal-box remote-box">
+    <div class="modal-title">Remote control</div>
+    <div class="modal-sub" id="rcSub">Scan this with a phone to use it as a remote for this screen.</div>
+    <div class="rc-qr hidden" id="rcQr"></div>
+    <div class="rc-code" id="rcCode">------</div>
+    <div class="rc-link" id="rcLink"></div>
+    <div class="rc-status" id="rcStatus">Connecting…</div>
+    <div class="rc-note hidden" id="rcAudioNote">🔇 Sound is locked by the browser. Tap anywhere on this screen once to turn it on.</div>
+    <div class="modal-actions">
+      <button class="btn" id="rcCopy" type="button">Copy link</button>
+      <button class="btn" id="rcNew" type="button">New code</button>
+    </div>
+    <div class="modal-actions" style="margin-top:10px;">
+      <button class="btn btn-teal" id="rcClose" type="button">Done</button>
+    </div>
+    <button class="rc-linkbtn" id="rcOff" type="button">Turn remote off</button><br>
+    <button class="rc-linkbtn" id="rcUseRemote" type="button" style="margin-top:0;">Use this device as the remote instead</button>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="confirmModal">
   <div class="modal-box">
     <div class="modal-title">Start a new game?</div>
@@ -662,6 +870,9 @@
   </div>
 </div>
 
+<!-- Libraries for the remote feature. If either fails to load, the game still works normally. -->
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.15.2/dist/mqtt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 (function(){
   "use strict";
@@ -1598,6 +1809,494 @@
     }
   }, 100);
 
+  /* ================= REMOTE CONTROL (one-way) =================
+     One device shows the game (the "display"). A second device ("remote") sends button
+     presses to it. Messages travel through free public MQTT relays over secure
+     WebSockets, so this works from GitHub Pages with no server of your own.
+     Several relays are used at once for redundancy; if any one of them is up it works.
+     The room code is the only thing protecting the channel, so keep it to yourselves. */
+  var BROKERS = [
+    'wss://broker.emqx.io:8084/mqtt',
+    'wss://broker.hivemq.com:8884/mqtt',
+    'wss://test.mosquitto.org:8081'
+  ];
+  var TOPIC_ROOT = 'dansbtc/1/';
+  var CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I, O, 0, 1
+  var qs = new URLSearchParams(window.location.search);
+  var IS_REMOTE = qs.has('remote');
+
+  var store = {
+    get:function(k){ try{ return window.localStorage.getItem(k); }catch(e){ return null; } },
+    set:function(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){} },
+    del:function(k){ try{ window.localStorage.removeItem(k); }catch(e){} }
+  };
+  function randomString(len, chars){
+    var out = '', arr = new Uint32Array(len), i;
+    if(window.crypto && window.crypto.getRandomValues){ window.crypto.getRandomValues(arr); }
+    else { for(i=0;i<len;i++) arr[i] = Math.floor(Math.random()*4294967296); }
+    for(i=0;i<len;i++) out += chars.charAt(arr[i] % chars.length);
+    return out;
+  }
+  function normCode(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12); }
+  function validCode(s){ return /^[A-Z0-9]{4,12}$/.test(s || ''); }
+  function remoteUrl(code){
+    var u = new URL(window.location.href);
+    u.search = ''; u.hash = '';
+    u.searchParams.set('remote', code);
+    return u.toString();
+  }
+  function decodePayload(p){
+    try{ if(typeof TextDecoder !== 'undefined') return new TextDecoder().decode(p); }catch(e){}
+    return String(p);
+  }
+
+  /* ---- transport: talks to every relay at once ---- */
+  function createLink(role, code, cb){
+    var tCmd = TOPIC_ROOT + code + '/cmd';
+    var tPres = TOPIC_ROOT + code + '/presence';
+    var entries = [];
+    var heartbeat = null;
+
+    function changed(){ if(cb.onStatus) cb.onStatus({}); }
+
+    function start(){
+      stop(false);
+      if(typeof mqtt === 'undefined' || !mqtt.connect){
+        if(cb.onStatus) cb.onStatus({ error:'lib' });
+        return;
+      }
+      BROKERS.forEach(function(url){
+        var e = { url:url, ok:false, presence:null, dead:false, client:null };
+        entries.push(e);
+        var opts = {
+          clientId:'btc' + role.charAt(0) + randomString(9, 'abcdefghijklmnopqrstuvwxyz0123456789'),
+          clean:true, keepalive:15, reconnectPeriod:2500, connectTimeout:8000, protocolVersion:4
+        };
+        if(role === 'display'){ opts.will = { topic:tPres, payload:'offline', qos:1, retain:true }; }
+        var c;
+        try{ c = mqtt.connect(url, opts); }catch(err){ return; }
+        e.client = c;
+        c.on('connect', function(){
+          if(e.dead) return;
+          e.ok = true;
+          if(role === 'display'){
+            c.subscribe(tCmd, { qos:0 });
+            c.publish(tPres, 'online', { qos:1, retain:true });
+          } else {
+            c.subscribe(tPres, { qos:1 });
+          }
+          changed();
+        });
+        function lost(){ if(e.dead) return; e.ok = false; if(role === 'remote') e.presence = null; changed(); }
+        c.on('close', lost);
+        c.on('offline', lost);
+        c.on('error', function(){ /* the client retries on its own */ });
+        c.on('message', function(topic, payload){
+          if(e.dead) return;
+          var text = decodePayload(payload);
+          if(role === 'display' && topic === tCmd){ if(cb.onCommand) cb.onCommand(text); }
+          else if(role === 'remote' && topic === tPres){ e.presence = (text === 'online'); changed(); }
+        });
+      });
+      if(role === 'display'){
+        // refresh "online" regularly so a stale "offline" notice always corrects itself
+        heartbeat = setInterval(function(){
+          entries.forEach(function(e){
+            if(e.ok && e.client && e.client.connected){
+              try{ e.client.publish(tPres, 'online', { qos:0, retain:true }); }catch(err){}
+            }
+          });
+        }, 8000);
+      }
+      changed();
+    }
+
+    function stop(graceful){
+      if(heartbeat){ clearInterval(heartbeat); heartbeat = null; }
+      var old = entries;
+      entries = [];
+      old.forEach(function(e){
+        e.dead = true;
+        var c = e.client;
+        if(!c) return;
+        try{
+          if(graceful && role === 'display' && e.ok){ c.publish(tPres, 'offline', { qos:1, retain:true }); }
+          setTimeout(function(){ try{ c.end(true); }catch(err){} }, graceful ? 350 : 0);
+        }catch(err){}
+      });
+    }
+
+    return {
+      start:start,
+      stop:stop,
+      restart:function(){ start(); },
+      publish:function(obj){
+        var text = JSON.stringify(obj), n = 0;
+        entries.forEach(function(e){
+          if(e.ok && e.client && e.client.connected){
+            try{ e.client.publish(tCmd, text, { qos:0 }); n++; }catch(err){}
+          }
+        });
+        return n;
+      },
+      connectedCount:function(){ var n = 0; entries.forEach(function(e){ if(e.ok) n++; }); return n; },
+      displayOnline:function(){ return entries.some(function(e){ return e.ok && e.presence === true; }); }
+    };
+  }
+
+  /* ---- keep the screen awake and recover after the phone sleeps ---- */
+  var wakeSentinel = null;
+  var hiddenAt = 0;
+  var dispLink = null, rmLink = null;
+  function wakeWanted(){ return IS_REMOTE ? !!rmLink : !!(dispLink); }
+  function requestWake(){
+    if(!wakeWanted() || wakeSentinel || document.hidden || !('wakeLock' in navigator)) return;
+    try{
+      navigator.wakeLock.request('screen').then(function(s){
+        wakeSentinel = s;
+        s.addEventListener('release', function(){ wakeSentinel = null; });
+      }).catch(function(){});
+    }catch(e){}
+  }
+  function releaseWake(){
+    if(wakeSentinel){ try{ wakeSentinel.release(); }catch(e){} wakeSentinel = null; }
+  }
+  function restartLinks(){
+    if(dispLink) dispLink.restart();
+    if(rmLink) rmLink.restart();
+  }
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ hiddenAt = Date.now(); return; }
+    // a socket that was open before the device slept is often dead; reconnect to be safe
+    if(hiddenAt && Date.now() - hiddenAt > 4000) restartLinks();
+    requestWake();
+  });
+  window.addEventListener('online', restartLinks);
+  window.addEventListener('pageshow', function(e){ if(e.persisted) restartLinks(); });
+  window.addEventListener('pagehide', function(){ if(dispLink) dispLink.stop(true); });
+
+  /* ================= REMOTE: DISPLAY SIDE ================= */
+  var rcEnabled = false, rcCode = '', rcLinkError = false;
+  var seenIds = {}, seenQueue = [];
+
+  function audioLocked(){
+    return !state.muted && (!state.audioCtx || state.audioCtx.state !== 'running');
+  }
+  function unlockAudio(){
+    ensureAudio();
+    var ctx = state.audioCtx;
+    if(ctx){
+      try{ if(ctx.state === 'suspended') ctx.resume(); }catch(e){}
+      if(!ctx._rcWatched){ ctx._rcWatched = true; ctx.onstatechange = updateRcUi; }
+    }
+    updateRcUi();
+  }
+
+  var toastTimer = null;
+  function showToast(text, dim){
+    var t = $('#rcToast');
+    t.textContent = text;
+    t.classList.toggle('dim', !!dim);
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1500);
+  }
+
+  var CMD_LABEL = {
+    'start-game':'Start game', 'start-clock':'Start clock', 'correct':'Correct ✓', 'pause':'Pause / Resume',
+    'continue':'Continue', 'bonus':'Add time', 'set-time':'Set clocks', 'new-game':'New game'
+  };
+
+  function runRemoteCommand(cmd, arg){
+    var label = CMD_LABEL[cmd];
+    if(!label) return; // unknown commands are ignored
+    var done = false;
+    var onGame = (state.screen === 'game');
+    var el, s;
+    switch(cmd){
+      case 'start-game':
+        if(state.screen === 'setup' && !$('#startGameBtn').disabled){ $('#startGameBtn').click(); done = true; }
+        break;
+      case 'start-clock':
+        el = $('#startBtn');
+        if(onGame && !el.classList.contains('hidden') && !el.disabled){ el.click(); done = true; }
+        break;
+      case 'correct':
+        if(onGame && gameEligible() && !state.countdownActive){ $('#correctBtn').click(); done = true; }
+        break;
+      case 'pause':
+        el = $('#pauseBtn');
+        if(onGame && !el.classList.contains('hidden')){ el.click(); done = true; }
+        break;
+      case 'continue':
+        el = $('#continueBtn');
+        if(onGame && !$('#continueRow').classList.contains('hidden') && !el.disabled){ el.click(); done = true; }
+        break;
+      case 'bonus':
+        s = Math.round(Number(arg));
+        if(onGame && state.game.started && !state.game.over && isFinite(s) && s !== 0 && Math.abs(s) <= 600){
+          $('#bonusTimeInput').value = s;
+          $('#bonusTimeBtn').click();
+          label = (s > 0 ? '+' : '') + s + 's for everyone';
+          done = true;
+        }
+        break;
+      case 'set-time':
+        s = Math.round(Number(arg));
+        if(onGame && state.game.started && !state.game.over && isFinite(s) && s >= 1 && s <= 1800){
+          $('#setTimeInput').value = s;
+          $('#setTimeBtn').click();
+          label = 'All clocks set to ' + s + 's';
+          done = true;
+        }
+        break;
+      case 'new-game':
+        if((onGame || state.screen === 'result') && !state.countdownActive){ $('#confirmYesBtn').click(); done = true; }
+        break;
+    }
+    showToast('📱 ' + label + (done ? '' : ' — not available right now'), !done);
+  }
+
+  function handleIncoming(text){
+    var m;
+    try{ m = JSON.parse(text); }catch(e){ return; }
+    if(!m || m.v !== 1 || typeof m.cmd !== 'string' || typeof m.s !== 'string' || m.s.length > 16 || typeof m.n !== 'number') return;
+    var id = m.s + ':' + m.n;
+    if(seenIds[id]) return; // the same press can arrive through several relays
+    seenIds[id] = 1; seenQueue.push(id);
+    if(seenQueue.length > 300){ delete seenIds[seenQueue.shift()]; }
+    runRemoteCommand(m.cmd, m.arg);
+  }
+
+  function startDisplayLink(){
+    if(dispLink) dispLink.stop(false);
+    rcLinkError = false;
+    dispLink = createLink('display', rcCode, {
+      onStatus:function(info){ if(info && info.error === 'lib') rcLinkError = true; updateRcUi(); },
+      onCommand:handleIncoming
+    });
+    dispLink.start();
+    requestWake();
+  }
+
+  function updateRcUi(){
+    var chip = $('#rcChip');
+    chip.classList.toggle('hidden', !rcEnabled);
+    if(!rcEnabled) return;
+    var n = dispLink ? dispLink.connectedCount() : 0;
+    var cls = rcLinkError ? 'bad' : (n > 0 ? 'ok' : 'warn');
+    var locked = audioLocked();
+    $('#rcDot').className = 'rc-dot ' + cls;
+    $('#rcChipText').textContent = rcCode + (locked ? ' 🔇' : '');
+    $('#rcCode').textContent = rcCode;
+    var st = $('#rcStatus');
+    if(rcLinkError){ st.textContent = 'The relay library could not load. Check your internet connection and reload.'; st.className = 'rc-status bad'; }
+    else if(n > 0){ st.textContent = 'Ready · connected to ' + n + ' of ' + BROKERS.length + ' relays'; st.className = 'rc-status ok'; }
+    else { st.textContent = 'Connecting to relays…'; st.className = 'rc-status'; }
+    $('#rcAudioNote').classList.toggle('hidden', !locked);
+  }
+
+  function openRemoteModal(){
+    var url = remoteUrl(rcCode);
+    $('#rcLink').textContent = url;
+    var box = $('#rcQr');
+    box.innerHTML = '';
+    box.classList.add('hidden');
+    if(typeof qrcode !== 'undefined'){
+      try{
+        var qr = qrcode(0, 'M');
+        qr.addData(url); qr.make();
+        var n = qr.getModuleCount(), quiet = 3, size = n + quiet * 2, d = '';
+        for(var r = 0; r < n; r++){
+          for(var c = 0; c < n; c++){
+            if(qr.isDark(r, c)) d += 'M' + (c + quiet) + ' ' + (r + quiet) + 'h1v1h-1z';
+          }
+        }
+        box.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges" role="img" aria-label="QR code that opens the remote on a phone"><rect width="' + size + '" height="' + size + '" fill="#fff"/><path d="' + d + '" fill="#0b0d14"/></svg>';
+        box.classList.remove('hidden');
+      }catch(e){}
+    }
+    updateRcUi();
+    $('#remoteModal').classList.remove('hidden');
+  }
+  function closeRemoteModal(){ $('#remoteModal').classList.add('hidden'); }
+
+  function enableRemote(){
+    rcCode = normCode(store.get('btc_display_code'));
+    if(!validCode(rcCode)){ rcCode = randomString(6, CODE_CHARS); store.set('btc_display_code', rcCode); }
+    rcEnabled = true;
+    store.set('btc_remote_on', '1');
+    startDisplayLink();
+    updateRcUi();
+  }
+  function disableRemote(){
+    rcEnabled = false;
+    store.del('btc_remote_on');
+    if(dispLink){ dispLink.stop(true); dispLink = null; }
+    releaseWake();
+    updateRcUi();
+  }
+
+  function initDisplayMode(){
+    ['pointerdown','touchend','keydown','click'].forEach(function(ev){
+      document.addEventListener(ev, unlockAudio, { passive:true });
+    });
+    document.addEventListener('pointerdown', requestWake, { passive:true });
+
+    on($('#remoteBtn'), 'click', function(){
+      if(!rcEnabled) enableRemote();
+      openRemoteModal();
+    });
+    on($('#rcChip'), 'click', openRemoteModal);
+    on($('#rcClose'), 'click', closeRemoteModal);
+    on($('#remoteModal'), 'click', function(e){ if(e.target.id === 'remoteModal') closeRemoteModal(); });
+    on($('#rcCopy'), 'click', function(){
+      var btn = $('#rcCopy');
+      function done(ok){
+        btn.textContent = ok ? 'Copied ✓' : 'Press and hold the link to copy';
+        setTimeout(function(){ btn.textContent = 'Copy link'; }, 1800);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(remoteUrl(rcCode)).then(function(){ done(true); }, function(){ done(false); });
+      } else { done(false); }
+    });
+    on($('#rcNew'), 'click', function(){
+      if(dispLink){ dispLink.stop(true); dispLink = null; }
+      rcCode = randomString(6, CODE_CHARS);
+      store.set('btc_display_code', rcCode);
+      startDisplayLink();
+      openRemoteModal(); // redraws the QR and link
+    });
+    on($('#rcOff'), 'click', function(){ disableRemote(); closeRemoteModal(); });
+    on($('#rcUseRemote'), 'click', function(){ window.location.href = window.location.pathname + '?remote'; });
+
+    if(store.get('btc_remote_on') === '1') enableRemote();
+    setInterval(updateRcUi, 1500);
+  }
+
+  /* ================= REMOTE: PHONE SIDE ================= */
+  var rmCode = '', rmStartAt = 0, rmLinkError = false;
+  var rmSession = randomString(8, 'abcdefghijklmnopqrstuvwxyz0123456789');
+  var rmSeq = 0, rmLastAt = {}, rmNewGameArmed = null;
+
+  function updateRemoteStatus(){
+    var box = $('#rmStatus'), txt = $('#rmStatusText');
+    var n = rmLink ? rmLink.connectedCount() : 0;
+    var cls, text;
+    if(!rmLink){ cls = 'warn'; text = 'Enter a room code'; }
+    else if(rmLinkError){ cls = 'bad'; text = 'Could not load relay library'; }
+    else if(n === 0){
+      if(Date.now() - rmStartAt > 8000){ cls = 'bad'; text = 'No connection'; }
+      else { cls = 'warn'; text = 'Connecting…'; }
+    }
+    else if(rmLink.displayOnline()){ cls = 'ok'; text = 'Display connected'; }
+    else { cls = 'warn'; text = 'Waiting for the display…'; }
+    box.className = 'rm-status ' + cls;
+    txt.textContent = text;
+  }
+
+  function showPair(prefill){
+    $('#rmPad').classList.add('hidden');
+    $('#rmPair').classList.remove('hidden');
+    $('#rmChange').classList.add('hidden');
+    $('#rmCodeInput').value = prefill || '';
+    if(rmLink){ rmLink.stop(false); rmLink = null; }
+    releaseWake();
+    updateRemoteStatus();
+  }
+
+  function connectRemote(code){
+    rmCode = code;
+    store.set('btc_remote_code', code);
+    try{ window.history.replaceState(null, '', remoteUrl(code)); }catch(e){}
+    $('#rmPair').classList.add('hidden');
+    $('#rmPad').classList.remove('hidden');
+    $('#rmChange').classList.remove('hidden');
+    if(rmLink) rmLink.stop(false);
+    rmStartAt = Date.now(); rmLinkError = false;
+    rmLink = createLink('remote', code, {
+      onStatus:function(info){ if(info && info.error === 'lib') rmLinkError = true; updateRemoteStatus(); }
+    });
+    rmLink.start();
+    updateRemoteStatus();
+    requestWake();
+  }
+
+  function sendCmd(cmd, arg, label, btn){
+    var now = Date.now();
+    if(rmLastAt[cmd] && now - rmLastAt[cmd] < 500) return; // ignore accidental double taps
+    rmLastAt[cmd] = now;
+    var last = $('#rmLast');
+    var msg = { v:1, s:rmSession, n:++rmSeq, cmd:cmd };
+    if(arg !== undefined) msg.arg = arg;
+    var sent = rmLink ? rmLink.publish(msg) : 0;
+    if(btn){ btn.classList.remove('sent'); void btn.offsetWidth; btn.classList.add('sent'); }
+    if(sent > 0){
+      last.textContent = 'Sent: ' + label + ' ✓';
+      last.classList.remove('bad');
+      try{ if(navigator.vibrate) navigator.vibrate(15); }catch(e){}
+    } else {
+      last.textContent = 'Not connected, so that was not sent';
+      last.classList.add('bad');
+      try{ if(navigator.vibrate) navigator.vibrate([40, 40, 40]); }catch(e){}
+    }
+  }
+
+  function initRemoteMode(){
+    document.body.classList.add('is-remote');
+    document.title = 'Beat the Clock Remote';
+    var tm = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    if(tm) tm.setAttribute('content', 'Clock Remote');
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rm]'), function(btn){
+      on(btn, 'click', function(){
+        var cmd = btn.getAttribute('data-rm');
+        sendCmd(cmd, undefined, btn.textContent.replace(/^[^\w]+/, '').trim() || cmd, btn);
+      });
+    });
+    on($('#rmBonusBtn'), 'click', function(){
+      var v = Math.round(parseFloat($('#rmBonus').value));
+      if(isNaN(v) || v === 0) return;
+      sendCmd('bonus', v, (v > 0 ? '+' : '') + v + 's for everyone', $('#rmBonusBtn'));
+    });
+    on($('#rmSetBtn'), 'click', function(){
+      var v = Math.round(parseFloat($('#rmSet').value));
+      if(isNaN(v) || v < 1) return;
+      sendCmd('set-time', v, 'all clocks set to ' + v + 's', $('#rmSetBtn'));
+    });
+    on($('#rmNewGame'), 'click', function(){
+      var btn = $('#rmNewGame');
+      if(rmNewGameArmed){
+        clearTimeout(rmNewGameArmed); rmNewGameArmed = null;
+        btn.textContent = 'New game';
+        sendCmd('new-game', undefined, 'new game', btn);
+      } else {
+        btn.textContent = 'Tap again to confirm';
+        rmNewGameArmed = setTimeout(function(){ rmNewGameArmed = null; btn.textContent = 'New game'; }, 3000);
+      }
+    });
+
+    function submitCode(){
+      var c = normCode($('#rmCodeInput').value);
+      if(!validCode(c)){ $('#rmCodeInput').focus(); return; }
+      connectRemote(c);
+    }
+    on($('#rmCodeBtn'), 'click', submitCode);
+    on($('#rmCodeInput'), 'keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); submitCode(); } });
+    on($('#rmChange'), 'click', function(){ showPair(rmCode); });
+    on($('#rmShowGame'), 'click', function(){ window.location.href = window.location.pathname; });
+    document.addEventListener('pointerdown', requestWake, { passive:true });
+
+    var code = normCode(qs.get('remote'));
+    if(!validCode(code)) code = normCode(store.get('btc_remote_code'));
+    if(validCode(code)) connectRemote(code); else showPair('');
+    setInterval(updateRemoteStatus, 1000);
+  }
+
+  function initRemoteFeature(){
+    if(IS_REMOTE) initRemoteMode(); else initDisplayMode();
+  }
+
   /* ---------------- init ---------------- */
   function seedDefaultPlayers(){
     state.setupPlayers = [];
@@ -1608,6 +2307,7 @@
   seedDefaultPlayers();
   renderSetup();
   goScreen('setup');
+  initRemoteFeature();
 
 })();
 </script>
