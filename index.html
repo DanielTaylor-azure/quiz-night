@@ -910,6 +910,12 @@
   /* QR box keeps its size while the code library loads (or if it cannot load) */
   .rc-qr{ display:flex; align-items:center; justify-content:center; }
   .rc-qr-note{ color:#3a3f52; font-size:0.85rem; font-weight:600; text-align:center; line-height:1.4; padding:12px; }
+
+  /* every control button greys out when it cannot be used right now */
+  #remoteApp .rm-btn:disabled, #remoteApp .rm-sign:disabled, #remoteApp .rm-qbtn:disabled, #remoteApp .btn:disabled{
+    background:#20222b; border-color:#2a2d38; color:#6d7182; box-shadow:none; opacity:0.6; cursor:not-allowed;
+  }
+  #remoteApp .rm-btn:disabled:active, #remoteApp .rm-qbtn:disabled:active, #remoteApp .btn:disabled:active{ transform:none; }
 </style>
 </head>
 <body>
@@ -2324,15 +2330,15 @@
       return JSON.stringify(o);
     }
     function parsePresence(text){
-      var none = { on:false, p:'', ph:'', nx:'', a:'', sc:'', cd:false, t:0 };
-      if(text === 'online') return { on:true, p:'', ph:'', nx:'', a:'', sc:'', cd:false, t:0 };
+      var none = { on:false, p:'', ph:'', nx:'', a:'', sc:'', cd:false, u:null, t:0 };
+      if(text === 'online') return { on:true, p:'', ph:'', nx:'', a:'', sc:'', cd:false, u:null, t:0 };
       try{
         var o = JSON.parse(text);
         if(o && typeof o === 'object'){
           var s = function(v, n){ return typeof v === 'string' ? v.slice(0, n) : ''; };
           return { on:!!o.on, p:s(o.p, 40), ph:s(o.ph, 8), nx:s(o.nx, 40), a:s(o.a, 32),
                    sc:(o.sc === 'setup' || o.sc === 'game' || o.sc === 'result') ? o.sc : '',
-                   cd:!!o.cd, t:(typeof o.t === 'number' ? o.t : 0) };
+                   cd:!!o.cd, u:(typeof o.u === 'string' ? o.u.slice(0, 60) : null), t:(typeof o.t === 'number' ? o.t : 0) };
         }
       }catch(e){}
       return none;
@@ -2497,9 +2503,34 @@
     'continue':'Continue', 'bonus':'Add time', 'set-time':'Set clocks', 'new-game':'New game', 'set-players':'Set players'
   };
 
+  var CMD_CODE = { 'start-game':'sg', 'start-clock':'sc', 'correct':'co', 'pause':'pa', 'continue':'cn',
+                   'bonus':'bo', 'set-time':'st', 'set-players':'sp', 'new-game':'ng' };
+  // Is this command something the game can do at this exact moment? (the phone greys out what is not)
+  function canRun(cmd){
+    var onGame = (state.screen === 'game'), g = state.game, el;
+    switch(cmd){
+      case 'start-game':  return state.screen === 'setup' && !$('#startGameBtn').disabled;
+      case 'start-clock': el = $('#startBtn'); return onGame && !el.classList.contains('hidden') && !el.disabled;
+      case 'correct':     return onGame && gameEligible() && !state.countdownActive;
+      case 'pause':       return onGame && !$('#pauseBtn').classList.contains('hidden');
+      case 'continue':    el = $('#continueBtn'); return onGame && !$('#continueRow').classList.contains('hidden') && !el.disabled;
+      case 'bonus':
+      case 'set-time':    return onGame && !!g && g.started && !g.over;
+      case 'set-players': return state.screen === 'setup';
+      case 'new-game':    return (onGame || state.screen === 'result') && !state.countdownActive;
+    }
+    return false;
+  }
+  function usableCodes(){
+    var out = [];
+    for(var c in CMD_CODE){ if(Object.prototype.hasOwnProperty.call(CMD_CODE, c) && canRun(c)) out.push(CMD_CODE[c]); }
+    return out.join(',');
+  }
+
   function runRemoteCommand(cmd, arg){
     var label = CMD_LABEL[cmd];
     if(!label) return; // unknown commands are ignored
+    if(!canRun(cmd)) return; // not possible right now
     var done = false;
     var onGame = (state.screen === 'game');
     var el, s;
@@ -2605,6 +2636,7 @@
     if(t){ o.p = t.p; o.ph = t.ph; if(t.nx) o.nx = t.nx; }
     if(state.countdownActive) o.cd = 1;
     if(lastAck) o.a = lastAck;
+    o.u = usableCodes();
     return o;
   }
   // tell the phone straight away whenever something it shows has changed
@@ -2765,6 +2797,14 @@
     if(store.get('btc_remote_on') === '1') enableRemote();
     setInterval(updateRcUi, 1500);
     setInterval(notifyStatus, 500);   // safety net only: changes are normally sent the instant they happen
+    if(window.MutationObserver){      // buttons appearing, hiding or greying on the main screen are passed to the phone at once
+      var queued = false;
+      new MutationObserver(function(){
+        if(queued) return;
+        queued = true;
+        setTimeout(function(){ queued = false; notifyStatus(); }, 0);
+      }).observe($('#app'), { subtree:true, attributes:true, attributeFilter:['class', 'disabled'] });
+    }
   }
 
   /* ================= REMOTE: PHONE SIDE ================= */
@@ -2829,30 +2869,56 @@
     if(b.disabled !== off) b.disabled = off;
     b.setAttribute('aria-disabled', off ? 'true' : 'false');
   }
+  function setDisabledEl(b, off){
+    if(!b) return;
+    if(b.disabled !== off) b.disabled = off;
+    b.setAttribute('aria-disabled', off ? 'true' : 'false');
+  }
+  function setHint(el, note){
+    if(Date.now() - rmLastSentAt <= 3500) return;     // let a fresh "Sent" note stay for a moment
+    if(note){ el.textContent = note; el.className = 'rm-last hint'; }
+    else if(el.classList.contains('hint')){ el.textContent = ''; el.className = 'rm-last'; }
+  }
+  // Every control button follows what the main screen says it can do right now.
   function updateHostSheet(){
     var st = rmLink ? rmLink.displayState() : null;
-    var known = !!(st && st.sc);                 // if we do not know what the display is doing, nothing is greyed out
-    var running = !known || (st.sc === 'game' && (st.ph === 'run' || st.ph === 'paused' || st.ph === 'next'));
-    var canNew = !known || ((st.sc === 'game' || st.sc === 'result') && !st.cd);
-    var canSend = !known || st.sc === 'setup';
-    setDisabled('#rmBonusBtn', !(running && validBonus()));
-    setDisabled('#rmSetBtn', !(running && validSet()));
-    setDisabled('#rmNewGame', !canNew);
-    setDisabled('#rmSendPlayers', !canSend);
-    setDisabled('#rmSendStart', !canSend);
-    if(!canNew && rmNewGameArmed){ clearTimeout(rmNewGameArmed); rmNewGameArmed = null; $('#rmNewGame').textContent = 'New game'; }
-    var note = '';
-    if(known){
-      if(st.sc === 'setup') note = 'Start a game to use these.';
-      else if(st.sc === 'result') note = 'Available during a game.';
-      else if(!running) note = (st.ph === 'ready') ? 'Available once the clock starts.' : 'The game is over.';
-      else if(!canNew) note = 'New game: after the countdown.';
+    var conn = !!rmLink && rmLink.connectedCount() > 0;
+    var online = conn && rmLink.displayOnline();
+    var ulist = (st && typeof st.u === 'string') ? st.u.split(',') : null;   // null: the display does not say, so allow
+    function ok(code){ return online && (ulist === null || ulist.indexOf(code) !== -1); }
+    [['correct', 'co'], ['start-clock', 'sc'], ['pause', 'pa'], ['continue', 'cn'], ['start-game', 'sg']].forEach(function(p){
+      setDisabledEl(document.querySelector('[data-rm="' + p[0] + '"]'), !ok(p[1]));
+    });
+    var enough = cleanPlayers().length >= 2;
+    setDisabled('#rmBonusBtn', !(ok('bo') && validBonus()));
+    setDisabled('#rmSetBtn', !(ok('st') && validSet()));
+    setDisabled('#rmNewGame', !ok('ng'));
+    setDisabled('#rmSendPlayers', !(ok('sp') && enough));
+    setDisabled('#rmSendStart', !(ok('sp') && enough));
+    setDisabled('#rmSortBtn', rmPlayers.length < 2);
+    setDisabled('#rmAddBtn', !($('#rmAddName').value.replace(/\s+/g, ' ').trim() && rmPlayers.length < MAX_PLAYERS));
+    setDisabled('#rmCodeBtn', !validCode(normCode($('#rmCodeInput').value)));
+    if(!ok('ng') && rmNewGameArmed){ clearTimeout(rmNewGameArmed); rmNewGameArmed = null; $('#rmNewGame').textContent = 'New game'; }
+
+    // short explanations for anything that is greyed out
+    var sheetNote = '', padNote = '';
+    if(!conn){ sheetNote = padNote = 'Connecting…'; }
+    else if(!online){ sheetNote = padNote = 'Waiting for the display…'; }
+    else if(st && st.sc){
+      if(st.sc === 'setup'){
+        sheetNote = 'Start a game to use these.';
+        if(ulist && ulist.indexOf('sg') === -1) padNote = 'Add at least 2 players to start.';
+      }
+      else if(st.sc === 'result') sheetNote = 'Available during a game.';
+      else if(ulist && ulist.indexOf('bo') === -1) sheetNote = (st.ph === 'ready') ? 'Available once the clock starts.' : 'The game is over.';
+      else if(ulist && ulist.indexOf('ng') === -1) sheetNote = 'New game: after the countdown.';
     }
-    var l = $('#rmSheetLast');
-    if(Date.now() - rmLastSentAt > 3500){
-      if(note){ l.textContent = note; l.className = 'rm-last hint'; }
-      else if(l.classList.contains('hint')){ l.textContent = ''; l.className = 'rm-last'; }
-    }
+    setHint($('#rmSheetLast'), sheetNote);
+    setHint($('#rmLast'), padNote);
+    // players sheet: say why Send is greyed
+    var pm = $('#rmPmsg');
+    if(!enough && !pm.classList.contains('ok')){ if(pm.textContent !== 'Add at least 2 players with names to send.'){ pm.textContent = 'Add at least 2 players with names to send.'; pm.className = 'rm-pmsg'; } }
+    else if(pm.textContent === 'Add at least 2 players with names to send.'){ pm.textContent = 'Names and seconds per player. Applies while the display is on its setup screen.'; pm.className = 'rm-pmsg'; }
   }
 
   function showPair(prefill){
@@ -2984,6 +3050,7 @@
       list.appendChild(row);
     });
     if(keepScroll) list.scrollTop = top;
+    updateHostSheet();
   }
   function cleanPlayers(){
     var out = [];
@@ -3231,6 +3298,8 @@
       setPmsg('Sorted by time, most first. Tap Send to display to apply it.');
     });
     on($('#rmAddBtn'), 'click', addPlayer);
+    on($('#rmAddName'), 'input', updateHostSheet);
+    on($('#rmCodeInput'), 'input', updateHostSheet);
     on($('#rmAddName'), 'keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); addPlayer(); } });
     on($('#rmSendPlayers'), 'click', function(){ sendPlayers(false); });
     on($('#rmSendStart'), 'click', function(){ sendPlayers(true); });
@@ -3239,6 +3308,7 @@
     document.addEventListener('pointerdown', requestWake, { passive:true });
 
     loadQuestions();
+    updateHostSheet();
     var code = normCode(qs.get('remote'));
     if(!validCode(code)) code = normCode(store.get('btc_remote_code'));
     if(validCode(code)) connectRemote(code); else showPair('');
