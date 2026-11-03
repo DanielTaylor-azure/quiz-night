@@ -685,9 +685,22 @@
   #fit.port .result-left > .footer-actions{ order:3; }
 
   .topbar{ padding:2px 2px 10px; }
-  #screen-setup .card{ max-width:820px; margin-left:auto; margin-right:auto; }
-  #screen-setup .card.wide{ max-width:1020px; }
-  #fit.land .setup-list.two-col{ display:grid; grid-template-columns:1fr 1fr; }
+  /* Setup: the player list is a fixed-size window, so adding or removing players never changes
+     the size of the screen (and therefore never rescales the UI). Extra players scroll inside it. */
+  #screen-setup .card{ max-width:860px; width:100%; margin-left:auto; margin-right:auto; }
+  .setup-list{
+    display:grid; grid-template-columns:1fr; grid-auto-rows:min-content; align-content:start; gap:8px;
+    --srows:6; height:calc(var(--srows) * 64px - 8px);
+    overflow-y:auto; scrollbar-width:none; overscroll-behavior:contain;
+    margin:14px 0;
+  }
+  .setup-list::-webkit-scrollbar{ display:none; }
+  #fit.land .setup-list{ grid-template-columns:1fr 1fr; --srows:5; }
+  .setup-row{ height:56px; padding-top:0; padding-bottom:0; }
+  .setup-list.more{
+    -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 30px), transparent);
+            mask-image:linear-gradient(to bottom, #000 calc(100% - 30px), transparent);
+  }
   .hero h1{ font-size:4rem; }
   #fit.port .hero h1{ font-size:3.3rem; }
   .stage-head h2{ font-size:2.4rem; }
@@ -699,11 +712,30 @@
   .modal-overlay{ overflow:hidden; }
 
   /* "THE FINAL" label belongs inside the duel header, centred over the VS divider */
-  .duel-wrap{ position:relative; }
   @media (max-height:480px){
     .rm-sheet-inner{ gap:8px; padding-top:10px; }
     .rm-sheet-title{ display:none; }
   }
+
+  /* ---- the final: same height as the single-player header (so nothing jumps), pill-shaped label ---- */
+  .stage-head{ height:120px; min-height:0; margin-top:16px; }
+  .duel-wrap{ position:relative; margin-top:16px; }
+  .duel-head{ height:120px; min-height:0; }
+  .duel-side{ padding:18px 14px 10px; }
+  .duel-title{
+    top:-14px; z-index:3;
+    font-size:0.95rem; letter-spacing:0.16em; line-height:1; white-space:nowrap;
+    padding:7px 18px 6px; border-radius:999px;
+    background:linear-gradient(180deg, #2b230d, #15120a);
+    border:1px solid var(--gold);
+    text-shadow:none;
+    animation:finalGlow 2s ease-in-out infinite;
+  }
+  @keyframes finalGlow{
+    0%,100%{ box-shadow:0 0 8px rgba(231,183,64,0.25), 0 3px 10px rgba(0,0,0,0.55); }
+    50%{ box-shadow:0 0 20px rgba(231,183,64,0.55), 0 3px 10px rgba(0,0,0,0.55); }
+  }
+  @media (prefers-reduced-motion: reduce){ .duel-title{ animation:none; } }
 
   /* ---------- remote: players editor ---------- */
   .rm-grid.three{ grid-template-columns:repeat(3, 1fr); }
@@ -739,7 +771,10 @@
   .rm-ibtn.remove:active{ color:var(--red); border-color:var(--red); }
   .rm-padd{ flex:0 0 auto; display:flex; gap:6px; align-items:stretch; }
   .rm-padd .btn{ flex:0 0 auto; padding:0 16px; }
-  .rm-pmsg{ flex:0 0 auto; min-height:1.2em; font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.3; }
+  .rm-pmsg{
+    flex:0 0 auto; height:2.7em; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.3;
+  }
   .rm-pmsg.ok{ color:var(--teal); }
   .rm-pmsg.bad{ color:var(--red); }
   @media (max-height:480px){ .rm-phead .rm-sheet-title{ display:none; } .rm-sheet.full .rm-sheet-inner{ height:calc(100% - 6px); } }
@@ -1235,6 +1270,7 @@
   /* ================= SETUP SCREEN ================= */
   function renderSetup(){
     var list = $('#setupList');
+    var keepTop = list.scrollTop;
     list.innerHTML = '';
     state.setupPlayers.forEach(function(p, idx){
       var row = document.createElement('div');
@@ -1294,9 +1330,14 @@
     var n = state.setupPlayers.length;
     $('#countNote').textContent = n + ' player' + (n===1?'':'s') + ' added';
     $('#startGameBtn').disabled = n < 2;
-    list.classList.toggle('two-col', n > 5);
-    $('#screen-setup .card').classList.toggle('wide', n > 5);
+    list.scrollTop = keepTop;
+    updateSetupMore();
   }
+  function updateSetupMore(){
+    var l = $('#setupList');
+    l.classList.toggle('more', l.scrollHeight > l.clientHeight + 2 && l.scrollTop + l.clientHeight < l.scrollHeight - 2);
+  }
+  on($('#setupList'), 'scroll', updateSetupMore);
 
   function addPlayerFromInput(){
     var nameInput = $('#playerNameInput');
@@ -1308,6 +1349,8 @@
     nameInput.value = '';
     nameInput.focus();
     renderSetup();
+    $('#setupList').scrollTop = $('#setupList').scrollHeight; // show the player just added
+    updateSetupMore();
   }
   on($('#addPlayerBtn'), 'click', addPlayerFromInput);
   on($('#playerNameInput'), 'keydown', function(e){
@@ -1449,7 +1492,7 @@
     var duel = getDuelPair();
     if(!duel && state.game.over && state.finalDuelPair){ duel = state.finalDuelPair; }
 
-    if(duel && state.game.started){
+    if(duel){
       $('#stageHeadSolo').classList.add('hidden');
       $('#duelHead').classList.remove('hidden');
       renderDuel(duel);
@@ -1487,7 +1530,7 @@
       if(over){
         isActive = (s.idx === state.winnerIndex); // highlight the winner once decided
       } else {
-        isActive = (s.idx === state.activeIndex) && gameEligible();
+        isActive = (s.idx === state.activeIndex) && (gameEligible() || !state.game.started);
       }
       s.name.textContent = pl.name;
       s.clock.textContent = fmtTime(pl.timeLeft);
