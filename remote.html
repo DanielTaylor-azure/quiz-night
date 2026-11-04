@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Clock Remote">
+<meta name="theme-color" content="#0b0d14">
+<title>Beat the Clock Remote</title>
+<!-- fonts load without holding up the page; the font stacks in base.css cover them if they never arrive -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/remote.css">
+<script src="vendor/mqtt.min.js" defer></script>
+<script type="module" src="js/remote.js"></script>
+</head>
+<body>
+<main id="remote" aria-label="Remote control">
+  <div class="rm-head">
+    <div class="rm-title">Remote</div>
+    <div class="rm-status warn" id="rmStatus" role="status" aria-live="polite"><span class="rm-dot"></span><span id="rmStatusText">Connecting…</span></div>
+  </div>
+
+  <!-- PAIRING: shown until the phone has a room code -->
+  <div class="rm-card" id="rmPair" hidden>
+    <label class="field-label" for="rmCodeInput">Room code</label>
+    <div class="row">
+      <input type="text" id="rmCodeInput" maxlength="12" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="A7K2QX">
+      <button type="button" class="btn btn-teal" id="rmCodeBtn">Connect</button>
+    </div>
+    <p class="rm-help">On the screen that shows the game, tap the 📡 button, then scan the QR code with this phone — or type the code shown there.</p>
+    <a class="link-btn" href="index.html">Show the game on this device instead</a>
+  </div>
+
+  <!-- THE PAD -->
+  <div class="rm-pad" id="rmPad" hidden>
+    <div class="rm-top">
+      <section class="rm-reader" aria-label="Question reader">
+        <div class="rm-rhead">
+          <span class="rm-rcount" id="rmQCount">Questions</span>
+          <span class="rm-rplayer invisible" id="rmQPlayer" aria-label="Current player"><span class="rm-rdot"></span><span id="rmQPlayerName"></span></span>
+        </div>
+        <div class="rm-rbody">
+          <div class="rm-qtext dim" id="rmQText">Loading questions…</div>
+          <div class="rm-qans invisible" id="rmQAns"><span class="rm-qlabel">Answer</span><span id="rmQAnsText"></span></div>
+        </div>
+        <div class="rm-rnav">
+          <button type="button" class="rm-qbtn" id="rmQFirst" disabled>⏮ First</button>
+          <button type="button" class="rm-qbtn" id="rmQPrev" aria-label="Previous question" disabled>◀ Prev</button>
+          <button type="button" class="rm-qbtn" id="rmQNext" aria-label="Next question" disabled>Next ▶</button>
+        </div>
+      </section>
+      <button type="button" class="rm-btn rm-correct" data-action="correct" data-label="Correct" aria-label="Correct answer">✓ CORRECT</button>
+    </div>
+    <div class="rm-last" id="rmLast" aria-live="polite"></div>
+    <div class="rm-grid">
+      <button type="button" class="rm-btn rm-gold" data-action="start-clock" data-label="Start clock">▶ Start clock</button>
+      <button type="button" class="rm-btn" data-action="pause" data-label="Pause / Resume">Pause / Resume</button>
+    </div>
+    <button type="button" class="rm-btn rm-red" data-action="continue" data-label="Continue">Continue →</button>
+    <div class="rm-grid three">
+      <button type="button" class="rm-btn" data-action="start-game" data-label="Start game">Start game</button>
+      <button type="button" class="rm-btn" id="rmPlayersBtn">👥 Players</button>
+      <button type="button" class="rm-btn" id="rmMoreBtn">⚙ Host</button>
+    </div>
+  </div>
+
+  <!-- HOST CONTROLS SHEET -->
+  <div class="rm-sheet" id="rmSheet" hidden>
+    <div class="rm-sheet-inner">
+      <div class="rm-sheet-title">Host controls</div>
+      <div class="rm-host-row">
+        <label class="field-label" for="rmBonus">Add or remove time (seconds)</label>
+        <div class="row">
+          <input type="number" id="rmBonus" value="10" step="1" inputmode="numeric" aria-label="Seconds to add (negative removes)">
+          <button type="button" class="rm-sign" id="rmBonusSign" aria-label="Switch between adding and removing time">±</button>
+          <button type="button" class="btn btn-teal" id="rmBonusBtn">Apply</button>
+        </div>
+      </div>
+      <div class="rm-host-row">
+        <label class="field-label" for="rmSet">Set all clocks to (seconds)</label>
+        <div class="row">
+          <input type="number" id="rmSet" value="60" min="1" max="1800" step="1" inputmode="numeric" aria-label="Seconds to set all clocks to">
+          <button type="button" class="btn btn-teal" id="rmSetBtn">Set</button>
+        </div>
+      </div>
+      <div class="rm-qgroup">
+        <div class="rm-qgroup-head">
+          <span class="field-label">Questions</span>
+          <span class="rm-qsource" id="rmQSource">Default questions</span>
+        </div>
+        <div class="rm-qfile-row">
+          <label class="btn btn-teal rm-qfile-btn">Choose file…<input type="file" id="rmQFile" class="rm-file-input" accept=".json,application/json"></label>
+          <button type="button" class="btn" id="rmQDefault" hidden>Use default</button>
+        </div>
+        <div class="rm-qmsg" id="rmQMsg" aria-live="polite"></div>
+        <label class="rm-toggle"><input type="checkbox" id="rmQAdv" checked> Next question after Correct</label>
+      </div>
+      <div class="rm-last" id="rmSheetLast" aria-live="polite"></div>
+      <button type="button" class="rm-btn" id="rmNewGame">New game</button>
+      <div class="rm-foot">
+        <button type="button" class="link-btn" id="rmChange">Change code</button>
+        <a class="link-btn" href="index.html">Show the game on this device instead</a>
+        <button type="button" class="link-btn" id="rmReset">Reset all settings</button>
+      </div>
+      <button type="button" class="rm-btn rm-gold" id="rmSheetClose">Close</button>
+    </div>
+  </div>
+
+  <!-- PLAYERS SHEET -->
+  <div class="rm-sheet full" id="rmPlayersSheet" hidden>
+    <div class="rm-sheet-inner">
+      <div class="rm-phead">
+        <div class="rm-sheet-title">Players</div>
+        <button type="button" class="rm-x" id="rmPlayersClose" aria-label="Close players">✕</button>
+      </div>
+      <div class="rm-plist" id="rmPlist"></div>
+      <button type="button" class="rm-btn rm-sort" id="rmSortBtn">↕ Sort by time (most first)</button>
+      <div class="rm-padd">
+        <input type="text" class="rm-pname" id="rmAddName" maxlength="20" placeholder="New player" autocomplete="off" autocorrect="off" enterkeyhint="done" aria-label="New player name">
+        <input type="number" class="rm-ptime" id="rmAddTime" value="60" min="1" max="1800" step="1" inputmode="numeric" aria-label="Time in seconds">
+        <button type="button" class="btn btn-teal" id="rmAddBtn">Add</button>
+      </div>
+      <div class="rm-pmsg" id="rmPmsg" aria-live="polite">Names and seconds per player. Applies while the display is on its setup screen.</div>
+      <button type="button" class="rm-btn rm-gold" id="rmSendPlayers">Send to display</button>
+      <button type="button" class="rm-btn" id="rmSendStart">Send &amp; start game</button>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,202 @@
+/* The phone remote (remote.html). Portrait: the whole remote fits the screen without scrolling. */
+
+:root{
+  /* keep clear of the screen edges, which some phones curve or fade */
+  --edge-t:calc(env(safe-area-inset-top, 0px) + 20px);
+  --edge-r:calc(env(safe-area-inset-right, 0px) + 20px);
+  --edge-b:calc(env(safe-area-inset-bottom, 0px) + 22px);
+  --edge-l:calc(env(safe-area-inset-left, 0px) + 20px);
+}
+
+#remote{
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:10px;
+  width:100%; max-width:560px; margin:0 auto; height:100vh; height:100dvh;
+  padding:var(--edge-t) var(--edge-r) var(--edge-b) var(--edge-l);
+  -webkit-user-select:none; user-select:none;
+}
+
+/* ---------- header ---------- */
+.rm-head{ flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.rm-title{ font-family:var(--font-display); font-size:1.7rem; letter-spacing:0.04em; line-height:1; color:var(--gold); }
+.rm-status{
+  display:flex; align-items:center; gap:8px; min-width:0; padding:8px 13px; overflow:hidden; white-space:nowrap;
+  background:var(--panel); border:1px solid var(--line); border-radius:999px;
+  font-size:0.76rem; font-weight:700; color:var(--muted);
+}
+#rmStatusText{ overflow:hidden; text-overflow:ellipsis; }
+.rm-dot{ width:9px; height:9px; border-radius:50%; background:var(--muted); flex:0 0 auto; }
+.rm-status.ok .rm-dot{ background:var(--teal); box-shadow:0 0 0 3px var(--teal-soft); }
+.rm-status.warn .rm-dot{ background:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+.rm-status.bad .rm-dot{ background:var(--red); box-shadow:0 0 0 3px var(--red-soft); }
+
+/* ---------- pairing ---------- */
+.rm-card{
+  flex:0 0 auto; padding:18px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+  -webkit-user-select:auto; user-select:auto;
+}
+.rm-help{ margin:12px 0 0; font-size:0.82rem; color:var(--muted); line-height:1.45; }
+#rmCodeInput{ font-family:var(--font-mono); font-size:1.15rem; letter-spacing:0.2em; text-transform:uppercase; }
+
+/* ---------- the pad ---------- */
+.rm-pad{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
+.rm-top{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
+.rm-btn{
+  flex:0 0 auto; height:56px; height:clamp(46px, 7.6dvh, 72px); padding:0 12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.15;
+  font-family:var(--font-body); font-weight:800; font-size:1.02rem; letter-spacing:0.01em;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:16px; color:var(--paper);
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:transform .08s ease, border-color .15s ease, background .15s ease;
+}
+.rm-btn:active{ transform:scale(0.97); }
+.rm-btn.sent{ animation:btnPop .28s ease; }
+.rm-correct{
+  flex:0 0 25%; height:auto; min-height:0; white-space:nowrap; border-radius:18px;
+  background:var(--teal); border-color:var(--teal); color:var(--teal-ink); box-shadow:0 0 0 3px var(--teal-soft);
+  font-family:var(--font-display); letter-spacing:0.04em; font-size:2rem; font-size:clamp(1.4rem, min(8vw, 4.6dvh), 2.4rem);
+}
+.rm-gold{ background:var(--gold); border-color:var(--gold); color:var(--gold-ink); }
+.rm-red{ background:var(--red-soft); border-color:var(--red); color:var(--paper); }
+.rm-grid{ flex:0 0 auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.rm-grid.three{ grid-template-columns:repeat(3, 1fr); }
+.rm-grid.three .rm-btn{ padding:0 6px; font-size:0.9rem; }
+
+/* "Sent: …" feedback, or why buttons are greyed out */
+.rm-last{ flex:0 0 auto; min-height:1.2em; text-align:center; font-size:0.84rem; font-weight:700; color:var(--teal); }
+.rm-last.bad{ color:var(--red); }
+.rm-last.hint{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; color:var(--muted); }
+
+/* every control greys out clearly when it cannot be used right now */
+#remote :is(.rm-btn, .rm-sign, .rm-qbtn, .btn):disabled{
+  background:var(--disabled-bg); border-color:var(--disabled-line); color:var(--disabled-ink);
+  box-shadow:none; opacity:0.6; cursor:not-allowed; transform:none;
+}
+
+/* ---------- question reader ---------- */
+.rm-reader{
+  flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:8px; padding:10px 12px 12px;
+  background:var(--panel); border:1px solid var(--line); border-radius:18px;
+}
+.rm-rhead{ flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:26px; }
+.rm-rcount{ font-family:var(--font-mono); font-size:0.76rem; font-weight:700; letter-spacing:0.06em; color:var(--muted); }
+/* the player being asked right now (reported by the display) */
+.rm-rplayer{
+  display:inline-flex; align-items:center; gap:7px; min-width:0; max-width:66%; padding:3px 12px 3px 10px; line-height:1.2;
+  background:var(--gold-soft); border:1px solid rgba(231,183,64,0.45); border-radius:999px;
+  font-size:0.82rem; font-weight:800; color:var(--gold);
+}
+.rm-rplayer[data-phase="running"]{ background:var(--teal-soft); border-color:rgba(62,198,224,0.55); color:var(--teal); }
+.rm-rdot{ width:8px; height:8px; border-radius:50%; background:currentColor; flex:0 0 auto; }
+#rmQPlayerName{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* fixed text size; the question sits at the top (scrolling if very long), the answer is pinned to the bottom */
+.rm-rbody{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
+.rm-qtext{
+  flex:1 1 auto; min-height:0; overflow-y:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  font-size:1.5rem; line-height:1.25; font-weight:700; color:var(--paper); overflow-wrap:anywhere;
+}
+.rm-qtext::-webkit-scrollbar{ display:none; }
+.rm-qtext.dim{ font-size:1.05rem; font-weight:600; color:var(--muted); }
+.rm-qtext.more{
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent);
+          mask-image:linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent);
+}
+.rm-qans{
+  flex:0 0 auto; padding-top:8px; border-top:1px solid var(--line);
+  font-size:1.15rem; line-height:1.25; font-weight:700; color:var(--teal); overflow-wrap:anywhere;
+}
+.rm-qlabel{
+  display:block; margin-bottom:2px;
+  font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); font-weight:800;
+}
+#rmQAnsText{ display:block; min-height:2.5em; }   /* room for two lines, so short answers don't move */
+.rm-rnav{ flex:0 0 auto; display:grid; grid-template-columns:6.5rem 1fr 1fr; gap:8px; }
+.rm-qbtn{
+  height:40px; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:11px; color:var(--paper);
+  font-family:var(--font-body); font-weight:800; font-size:0.88rem;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.rm-qbtn:active{ transform:scale(0.97); }
+
+/* ---------- sheets (host controls, players) ---------- */
+.rm-sheet{
+  position:absolute; inset:0; z-index:5; display:flex; align-items:flex-end;
+  padding:var(--edge-t) var(--edge-r) var(--edge-b) var(--edge-l);
+  background:rgba(5,6,10,0.78); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+}
+.rm-sheet-inner{
+  width:100%; max-height:100%; overflow-y:auto; scrollbar-width:none;
+  display:flex; flex-direction:column; gap:12px;
+  padding:16px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  background:var(--panel); border:1px solid var(--line); border-radius:20px;
+  -webkit-user-select:auto; user-select:auto;
+}
+.rm-sheet-inner::-webkit-scrollbar{ display:none; }
+.rm-sheet-title{ font-family:var(--font-display); font-size:1.5rem; letter-spacing:0.04em; line-height:1; color:var(--gold); }
+.rm-host-row .row{ flex-wrap:nowrap; }
+.rm-host-row input[type=number]{ font-size:1.05rem; text-align:center; }
+.rm-sign{   /* phone number pads have no minus key: this flips the sign */
+  flex:0 0 46px; align-self:stretch; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px; color:var(--paper);
+  font-size:1.2rem; font-weight:800; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.rm-sign:active{ transform:scale(0.96); }
+.rm-foot{ display:flex; justify-content:center; gap:18px; flex-wrap:wrap; }
+
+/* questions group in the host sheet */
+.rm-qgroup{ display:flex; flex-direction:column; gap:8px; }
+.rm-qgroup-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.rm-qgroup-head .field-label{ margin-bottom:0; }
+.rm-qsource{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.8rem; font-weight:700; }
+.rm-qfile-row{ display:flex; gap:8px; }
+.rm-qfile-btn{ position:relative; flex:1 1 auto; display:flex; align-items:center; justify-content:center; text-align:center; }
+.rm-file-input{ position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
+.rm-qmsg{ min-height:1.3em; font-size:0.78rem; line-height:1.3; color:var(--muted); }
+.rm-qmsg.ok{ color:var(--teal); }
+.rm-qmsg.bad{ color:var(--red); }
+.rm-toggle{ display:flex; align-items:center; gap:10px; font-size:0.88rem; font-weight:600; }
+.rm-toggle input{ width:22px; height:22px; margin:0; accent-color:var(--teal); }
+
+/* players sheet: fills the screen, the list scrolls */
+.rm-sheet.full .rm-sheet-inner{ height:100%; overflow:hidden; gap:10px; }
+.rm-phead{ flex:0 0 auto; display:flex; align-items:center; gap:8px; }
+.rm-phead .rm-sheet-title{ flex:1; }
+.rm-x{
+  flex:0 0 40px; width:40px; height:40px; cursor:pointer;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px; color:var(--paper); font-size:1rem;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.rm-plist{
+  flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:8px;
+  overflow-y:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.rm-plist::-webkit-scrollbar{ display:none; }
+.rm-plist .plist-row{ flex:0 0 auto; gap:6px; padding:6px; }
+/* 16px text stops iOS zooming in when a box is tapped */
+.rm-plist input, .rm-padd input{ width:auto; min-width:0; padding:9px 10px; font-size:16px; }
+.rm-plist .plist-secs, .rm-padd .rm-ptime{ flex:0 0 64px; padding:9px 4px; text-align:center; }
+.rm-plist .plist-btn{ flex:0 0 34px; height:38px; border-radius:9px; font-size:0.95rem; }
+.rm-sort{ flex:0 0 auto; height:40px; font-size:0.88rem; }
+.rm-padd{ flex:0 0 auto; display:flex; align-items:stretch; gap:6px; }
+.rm-padd .rm-pname{ flex:1 1 0; }
+.rm-padd .btn{ flex:0 0 auto; padding:0 16px; }
+.rm-pmsg{
+  flex:0 0 auto; height:2.7em; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  text-align:center; font-size:0.78rem; line-height:1.3; color:var(--muted);
+}
+.rm-pmsg.ok{ color:var(--teal); }
+.rm-pmsg.bad{ color:var(--red); }
+.rm-card .link-btn{ display:inline-block; margin-top:14px; }
+
+/* Turned sideways on a phone: let it scroll rather than squash. (Last, so it wins over the rules above.) */
+@media (orientation: landscape) and (max-height: 500px){
+  html, body{ height:auto; overflow:visible; }
+  #remote{ height:auto; min-height:100dvh; overflow:visible; }
+  .rm-pad{ flex:none; }
+  .rm-top{ flex:none; height:480px; }
+  .rm-sheet{ position:fixed; }
+  .rm-sheet.full .rm-sheet-inner{ height:auto; overflow-y:auto; }
+  .rm-plist{ flex:none; overflow:visible; }
+}

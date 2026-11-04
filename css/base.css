@@ -1,0 +1,112 @@
+/* Shared by the display and the phone: colours, fonts, buttons, inputs and player-list rows. */
+
+:root{
+  --ink:#0b0d14;
+  --panel:#151827;
+  --panel-2:#1c2032;
+  --line:rgba(255,255,255,0.09);
+  --line-hover:rgba(255,255,255,0.3);
+
+  --gold:#e7b740;  --gold-hover:#f0c358;  --gold-soft:rgba(231,183,64,0.14);  --gold-ink:#211703;
+  --teal:#3ec6e0;  --teal-hover:#5cd3ea;  --teal-soft:rgba(62,198,224,0.14);  --teal-ink:#062a33;
+  --red:#d8434b;   --red-hover:#e3636a;   --red-soft:rgba(216,67,75,0.14);    --red-ink:#2c0a0c;
+  --paper:#f3f1ea;
+  --muted:#8b90a6;
+
+  --disabled-bg:#20222b;  --disabled-line:#2a2d38;  --disabled-ink:#6d7182;
+
+  --radius:16px;
+  --shadow:0 24px 60px rgba(0,0,0,0.5);
+  --font-display:'Bebas Neue','Oswald','Arial Narrow',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+
+*{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+.invisible{ visibility:hidden !important; }   /* hidden but still takes up its space */
+
+html, body{ height:100%; margin:0; overflow:hidden; overscroll-behavior:none; background:var(--ink); }
+body{
+  font-family:var(--font-body);
+  color:var(--paper);
+  background:
+    radial-gradient(ellipse 900px 550px at 50% -12%, rgba(231,183,64,0.12), transparent 60%),
+    radial-gradient(ellipse 800px 550px at 105% 105%, rgba(216,67,75,0.10), transparent 60%),
+    var(--ink);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- form fields ---------- */
+.field-label{
+  display:block; margin-bottom:8px;
+  font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);
+}
+input[type=text], input[type=number]{
+  width:100%; padding:11px 13px; outline:none;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; color:var(--paper);
+  font-family:var(--font-body); font-size:0.95rem;
+  transition:border-color .15s ease;
+}
+input:focus, button:focus-visible{ border-color:var(--teal); box-shadow:0 0 0 3px rgba(62,198,224,0.25); }
+.row{ display:flex; gap:10px; flex-wrap:wrap; }
+.row > input[type=text]{ flex:2; min-width:120px; }
+.row > input[type=number]{ flex:1; min-width:90px; }
+
+/* ---------- buttons ---------- */
+.btn{
+  padding:11px 18px; cursor:pointer;
+  font-family:var(--font-body); font-weight:700; font-size:0.9rem; letter-spacing:0.01em;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:11px; color:var(--paper);
+  transition:transform .08s ease, border-color .15s ease, background .15s ease;
+}
+.btn:hover{ border-color:var(--line-hover); }
+.btn:active{ transform:scale(0.97); }
+.btn:disabled{ opacity:0.35; cursor:not-allowed; }
+.btn-gold{ background:var(--gold); border-color:var(--gold); color:var(--gold-ink); }
+.btn-gold:hover{ background:var(--gold-hover); }
+.btn-teal{ background:var(--teal); border-color:var(--teal); color:var(--teal-ink); }
+.btn-teal:hover{ background:var(--teal-hover); }
+.btn-red{ background:var(--red); border-color:var(--red); color:var(--red-ink); }
+.btn-red:hover{ background:var(--red-hover); }
+.btn-block{ width:100%; padding:15px; font-size:1rem; }
+.btn-lg{ padding:16px 26px; font-size:1.05rem; }
+
+/* a button that looks like a link */
+.link-btn{
+  padding:6px; cursor:pointer; background:none; border:none;
+  color:var(--muted); font-family:var(--font-body); font-size:0.78rem; font-weight:600; text-decoration:underline;
+}
+.link-btn:hover{ color:var(--paper); }
+
+/* first tap of a tap-twice button (util.armConfirm) */
+.armed{ border-color:var(--red) !important; color:var(--red) !important; }
+
+.pop{ animation:btnPop .28s ease; }
+@keyframes btnPop{ 0%{transform:scale(1);} 45%{transform:scale(1.06);} 100%{transform:scale(1);} }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+/* ---------- player list rows (js/player-list.js); each page sets the sizes ---------- */
+.plist-row{
+  display:flex; align-items:center;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+}
+.plist-row .plist-name{ flex:1 1 0; min-width:0; }
+.plist-row .plist-secs{ min-width:0; text-align:center; }
+.plist-btn{
+  display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer;
+  background:var(--panel); border:1px solid var(--line); color:var(--paper);
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  transition:border-color .15s ease, transform .08s ease, color .15s ease;
+}
+.plist-btn:hover{ border-color:var(--line-hover); }
+.plist-btn:active{ transform:scale(0.94); }
+.plist-btn:disabled{ opacity:0.25; cursor:not-allowed; }
+.plist-btn.remove:hover, .plist-btn.remove:active{ color:var(--red); border-color:var(--red); }
+.plist-empty{ color:var(--muted); font-size:0.88rem; text-align:center; padding:18px 8px; }
+
+/* ---------- anyone who asks their device for less motion gets none ---------- */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation:none !important; transition:none !important; }
+}
