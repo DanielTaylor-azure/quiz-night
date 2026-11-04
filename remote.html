@@ -44,12 +44,12 @@
           <span class="rm-rcount" id="rmQCount">Questions</span>
           <span class="rm-rplayer invisible" id="rmQPlayer" aria-label="Current player"><span class="rm-rdot"></span><span id="rmQPlayerName"></span></span>
         </div>
-        <div class="rm-rbody">
+        <div class="rm-rbody" id="rmQBody">
           <div class="rm-qtext dim" id="rmQText">Loading questions…</div>
-          <div class="rm-qans invisible" id="rmQAns"><span class="rm-qlabel">Answer</span><span id="rmQAnsText"></span></div>
+          <div class="rm-qans invisible" id="rmQAns"><span class="rm-qlabel">Answer</span><span class="rm-qans-text" id="rmQAnsText"></span></div>
         </div>
         <div class="rm-rnav">
-          <button type="button" class="rm-qbtn" id="rmQFirst" disabled>⏮ First</button>
+          <button type="button" class="rm-qbtn rm-qfirst" id="rmQFirst" aria-label="Back to the first question (tap twice)" disabled>⏮</button>
           <button type="button" class="rm-qbtn" id="rmQPrev" aria-label="Previous question" disabled>◀ Prev</button>
           <button type="button" class="rm-qbtn" id="rmQNext" aria-label="Next question" disabled>Next ▶</button>
         </div>

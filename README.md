@@ -46,6 +46,8 @@ remembered on that phone until you choose another, tap **Use default**, or reset
 - A plain list `[ {...}, {...} ]` also works.
 - If something is wrong, the phone says what, e.g. *my-quiz.json: question 5 has no "question"*.
 - Files can be up to 1 MB.
+- Questions never need scrolling: every question in a set is shown at the same size, chosen so the longest
+  one fits. A very long question makes the whole set's text smaller, so keep questions reasonably short.
 
 ## Publishing
 

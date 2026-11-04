@@ -41,7 +41,6 @@ function connect(newCode){
   relay.start();
   render();
   connection.requestWake();
-  questions.refresh();            // the reader has only just become visible
 }
 
 function showPairing(prefill){

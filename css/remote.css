@@ -90,28 +90,29 @@
 .rm-rdot{ width:8px; height:8px; border-radius:50%; background:currentColor; flex:0 0 auto; }
 #rmQPlayerName{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-/* fixed text size; the question sits at the top (scrolling if very long), the answer is pinned to the bottom */
-.rm-rbody{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
+/* One text size for the whole question set (--qfs, set by js/questions.js so the longest question fits),
+   so nothing ever scrolls and the size never changes between questions. The question sits at the top;
+   the answer is pinned to the bottom. */
+.rm-reader{ position:relative; }
+.rm-rbody{ --qfs:24px; flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:10px; }
 .rm-qtext{
-  flex:1 1 auto; min-height:0; overflow-y:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
-  font-size:1.5rem; line-height:1.25; font-weight:700; color:var(--paper); overflow-wrap:anywhere;
+  flex:1 1 auto; min-height:0; overflow-y:auto; scrollbar-width:none;   /* scrolling is only a last resort */
+  font-size:var(--qfs); line-height:1.25; font-weight:700; color:var(--paper); overflow-wrap:anywhere;
 }
 .rm-qtext::-webkit-scrollbar{ display:none; }
 .rm-qtext.dim{ font-size:1.05rem; font-weight:600; color:var(--muted); }
-.rm-qtext.more{
-  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent);
-          mask-image:linear-gradient(to bottom, #000 calc(100% - 1.6em), transparent);
-}
 .rm-qans{
   flex:0 0 auto; padding-top:8px; border-top:1px solid var(--line);
-  font-size:1.15rem; line-height:1.25; font-weight:700; color:var(--teal); overflow-wrap:anywhere;
+  font-size:calc(var(--qfs) * 0.77); line-height:1.25; font-weight:700; color:var(--teal); overflow-wrap:anywhere;
 }
+/* an invisible copy of the reader text, used to measure which size fits */
+.rm-probe{ position:absolute; left:0; top:0; height:auto; visibility:hidden; pointer-events:none; }
 .rm-qlabel{
   display:block; margin-bottom:2px;
   font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); font-weight:800;
 }
-#rmQAnsText{ display:block; min-height:2.5em; }   /* room for two lines, so short answers don't move */
-.rm-rnav{ flex:0 0 auto; display:grid; grid-template-columns:6.5rem 1fr 1fr; gap:8px; }
+.rm-qans-text{ display:block; min-height:2.5em; }   /* room for two lines, so short answers don't move */
+.rm-rnav{ flex:0 0 auto; display:grid; grid-template-columns:3.25rem 1fr 1fr; gap:8px; }
 .rm-qbtn{
   height:40px; cursor:pointer;
   background:var(--panel-2); border:1px solid var(--line); border-radius:11px; color:var(--paper);
@@ -119,6 +120,8 @@
   touch-action:manipulation; -webkit-tap-highlight-color:transparent;
 }
 .rm-qbtn:active{ transform:scale(0.97); }
+.rm-qfirst{ padding:0; }
+.rm-qfirst.armed{ font-size:0.72rem; }   /* "Sure?" has to fit the narrow button */
 
 /* ---------- sheets (host controls, players) ---------- */
 .rm-sheet{

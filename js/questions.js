@@ -1,5 +1,9 @@
 // The question reader on the phone. Only the host sees it.
 //
+// Text size: every question in a set is shown at the same size, the largest (up to READER_MAX_PX) at which
+// the longest question and its answer fit the box, so nothing ever needs scrolling. It is worked out again
+// when a new set loads or the box changes size (for example when the phone is turned).
+//
 // It starts with the default questions.json (next to remote.html). The host can pick a JSON file of
 // their own (Host controls > Questions); that is saved on the phone and used until they switch back
 // to the default or reset all settings. It remembers your place in each list across reloads.
@@ -7,6 +11,10 @@
 // File format:  { "questions": [ { "question": "...", "answer": "..." }, ... ] }   (a bare [ ... ] also works)
 import { QUESTIONS_FILE, QUESTION_FILE_MAX_BYTES, MAX_QUESTIONS, STORAGE } from './config.js';
 import { $, store, plural, armConfirm } from './util.js';
+
+const READER_MAX_PX = 24;
+const READER_MIN_PX = 10;
+const MEASURE_LONGEST = 40;  // only the longest questions/answers need measuring to find the size
 
 const clean = (v) => (typeof v === 'string' || typeof v === 'number' ? String(v).replace(/\s+/g, ' ').trim() : '');
 
@@ -48,7 +56,11 @@ export function initQuestions(){
   let request = 0;                       // bumped whenever the source changes, so a late download is ignored
   let retries = 0, retryTimer = null;
 
+  let fittedFor = '';                    // the set and box size the current text size was worked out for
+  const mustFit = new Set();             // questions found too long at the current size (see render)
+
   const el = {
+    body: $('rmQBody'),
     count: $('rmQCount'), text: $('rmQText'), answer: $('rmQAns'), answerText: $('rmQAnsText'),
     first: $('rmQFirst'), prev: $('rmQPrev'), next: $('rmQNext'),
     source: $('rmQSource'), useDefault: $('rmQDefault'), file: $('rmQFile'), message: $('rmQMsg'),
@@ -71,7 +83,45 @@ export function initQuestions(){
     store.set(STORAGE.questionSig, sig);
     savePlace();
     state = 'ok';
+    mustFit.clear();
+    fitTextSize();
     render();
+  }
+
+  // ---- one text size for the whole set ----
+  // An invisible copy of the reader text, the same width as the real one, used for measuring.
+  const probe = document.createElement('div');
+  probe.className = 'rm-rbody rm-probe';
+  probe.setAttribute('aria-hidden', 'true');
+  probe.innerHTML = '<div class="rm-qtext"></div><div class="rm-qans"><span class="rm-qlabel">Answer</span><span class="rm-qans-text"></span></div>';
+  el.body.parentElement.append(probe);
+  const [probeQuestion, probeAnswer] = [probe.firstChild, probe.querySelector('.rm-qans-text')];
+
+  function fitTextSize(){
+    const width = el.body.clientWidth, height = el.body.clientHeight;
+    if(state !== 'ok' || !width || !height) return;      // hidden for now: done when it appears (ResizeObserver)
+    const key = `${signature()}|${width}|${height}|${mustFit.size}`;
+    if(key === fittedFor) return;
+    fittedFor = key;
+    const byLength = (field) => questions.slice().sort((a, b) => b[field].length - a[field].length).slice(0, MEASURE_LONGEST);
+    const toMeasure = new Set([...byLength('question'), ...byLength('answer'), ...[...mustFit].map((i) => questions[i])]);
+    probe.style.width = `${width}px`;
+    const fits = (px) => {
+      probe.style.setProperty('--qfs', `${px}px`);
+      for(const q of toMeasure){
+        probeQuestion.textContent = q.question;
+        probeAnswer.textContent = q.answer || '—';
+        if(probe.scrollHeight > height) return false;
+      }
+      return true;
+    };
+    let lo = READER_MIN_PX, hi = READER_MAX_PX;          // largest whole pixel size that fits
+    while(lo < hi){
+      const mid = Math.ceil((lo + hi) / 2);
+      if(fits(mid)) lo = mid; else hi = mid - 1;
+    }
+    probeQuestion.textContent = probeAnswer.textContent = '';
+    el.body.style.setProperty('--qfs', `${lo}px`);
   }
 
   // The default questions. If they fail to load it quietly tries again a few times (and whenever you
@@ -157,18 +207,16 @@ export function initQuestions(){
     el.next.disabled = state !== 'ok' || atEnd;
     el.first.disabled = state !== 'ok' || index === 0;
     if(el.first.disabled) firstConfirm.disarm();
-    updateFade();
+    // Only the longest questions are measured; if this one still does not fit, fit the set to it too.
+    if(showAnswer && el.text.scrollHeight > el.text.clientHeight + 1 && !mustFit.has(index)){
+      mustFit.add(index);
+      fitTextSize();
+    }
 
     // the Questions section of the host sheet
     const status = state === 'ok' ? plural(n, 'question') : state === 'loading' ? 'loading…' : 'not loaded';
     el.source.textContent = `${source.type === 'file' ? source.name : 'Default questions'} · ${status}`;
     el.useDefault.hidden = source.type !== 'file';
-  }
-
-  // Fade the bottom of a question too long to show at once, until it is scrolled to the end.
-  function updateFade(){
-    const t = el.text;
-    t.classList.toggle('more', t.scrollTop + t.clientHeight < t.scrollHeight - 2);
   }
 
   function step(by){
@@ -178,11 +226,11 @@ export function initQuestions(){
     render();
   }
 
-  const firstConfirm = armConfirm(el.first, 'Tap again', () => { if(state === 'ok'){ index = 0; savePlace(); render(); } });
+  const firstConfirm = armConfirm(el.first, 'Sure?', () => { if(state === 'ok'){ index = 0; savePlace(); render(); } });
   el.prev.addEventListener('click', () => step(-1));
   el.next.addEventListener('click', () => step(1));
-  el.text.addEventListener('scroll', updateFade);
-  window.addEventListener('resize', updateFade);
+  new ResizeObserver(fitTextSize).observe(el.body);       // turned, resized, or just became visible
+  document.fonts?.ready.then(() => { fittedFor = ''; fitTextSize(); });
   el.file.addEventListener('change', () => {
     const file = el.file.files && el.file.files[0];
     el.file.value = '';                  // so the same file can be picked again after editing it
@@ -199,5 +247,5 @@ export function initQuestions(){
   if(parsed && !parsed.error) use(parsed.questions, { type: 'file', name: saved.name.slice(0, 60) }, false);
   else { store.remove(STORAGE.customQuestions); loadDefault(false); }
 
-  return { next: () => step(1), refresh: updateFade };
+  return { next: () => step(1) };
 }

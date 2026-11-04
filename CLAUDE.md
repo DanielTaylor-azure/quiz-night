@@ -20,7 +20,7 @@ No build step, no npm, no framework: plain ES modules served by GitHub Pages. Se
 | `js/display.js` | Display entry point: `ui` state, `perform()`, `render()`, countdown, tick loop, fit-to-screen, wiring. |
 | `js/display-remote.js` | Display side of the remote: on/off, pairing dialog and QR, runs incoming commands, publishes status. |
 | `js/remote.js` | Phone entry point: connecting, sending commands, pad and host sheet, players sheet. |
-| `js/questions.js` | Phone question reader: default file, a picked file, saved place, `parseQuestions`. |
+| `js/questions.js` | Phone question reader: default file, a picked file, saved place, `parseQuestions`, and the one-size-per-set text fitting. |
 | `js/relay.js` | MQTT link over several relays, message checks (`parseCommand`, `parseStatus`), reconnect and wake lock. |
 | `js/player-list.js` | Editable player rows, used by the display's setup screen and the phone's Players sheet. |
 | `js/sound.js` | Web Audio beeps. Sounds are data in `CUES`; `playSecond()` is the escalating countdown alarm. |
@@ -50,6 +50,8 @@ No build step, no npm, no framework: plain ES modules served by GitHub Pages. Se
   - New game is not allowed during the 3-2-1 countdown.
   - New game resets the display to Player 1–4.
   - Nobody still in can be taken below 1 s, so there is always a winner.
+  - The phone reader never scrolls and its text size never changes between questions: `fitTextSize()` picks one
+    size per question set (24px down to 10px) so the longest question and its answer fit.
 
 ## Message protocol (relay.js)
 
@@ -107,5 +109,6 @@ Topics are `dansbtc/2/<ROOM>/cmd` and `dansbtc/2/<ROOM>/status`.
 6. Phone reader:
    - the default questions load
    - Choose file accepts a good JSON file and refuses a broken one with a message
-   - ⏮ First needs two taps
+   - ⏮ First needs two taps (it shows "Sure?" after the first)
+   - no question needs scrolling, and every question in a set is the same size
    - Reset all settings restores the defaults and stays connected
